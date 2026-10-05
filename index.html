@@ -1,0 +1,1016 @@
+<!doctype html>
+<!--
+Owlchi: a calm learning game with an owl helper.
+MIT License. Copyright (c) 2026 Owlchi contributors. See LICENSE file.
+Not affiliated with or endorsed by Qcells or Hanwha. Course facts were checked against public sources on 2026-10-04; verify before relying on them.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owlchi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF2F5;--card:#FFFFFF;--ink:#17232F;--mute:#51606E;--line:#C3CFD9;--accent:#0B6E69;--accent-ink:#FFFFFF;--soft:#E3EEED;--know:#1D7A3A;--review:#8F5400;--revisit:#B3261E;--owl-b:#3B4A5A;--owl-l:#D9E2EA;--owl-o:#E39B2D;--grid:rgba(23,35,47,.045);--size:1;--p1:#5B7B96;--p2:#8FA3B4;--p3:#D99A2B;--p4:#6F8296}
+@media (prefers-color-scheme:dark){:root{--bg:#10181F;--card:#18232D;--ink:#E8EEF3;--mute:#A3B4C2;--line:#2F3F4D;--accent:#55C7BE;--accent-ink:#06211F;--soft:#1E3338;--know:#6FD08A;--review:#F2B35A;--revisit:#FF8A80;--owl-b:#8FA6BA;--owl-l:#2A3946;--grid:rgba(255,255,255,.04)}}
+body[data-th=t1]{--bg:#EEF2F5}body[data-th=t2]{--bg:#F0F2E8}body[data-th=t3]{--bg:#EBF3F8}body[data-th=t4]{--bg:#E8F3EF}
+body[data-th=t5]{--bg:#ECEFF7}body[data-th=t6]{--bg:#F0EDF5}body[data-th=t7]{--bg:#F2F0EA}body[data-th=t8]{--bg:#F4EDED}
+@media (prefers-color-scheme:dark){body[data-th=t1]{--bg:#10181F}body[data-th=t2]{--bg:#14190F}body[data-th=t3]{--bg:#0F1822}body[data-th=t4]{--bg:#0F1C18}body[data-th=t5]{--bg:#12162A}body[data-th=t6]{--bg:#181427}body[data-th=t7]{--bg:#1A1712}body[data-th=t8]{--bg:#1C1313}}
+*{box-sizing:border-box}
+html{font-size:calc(18px * var(--size))}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:16px 16px;color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,system-ui,sans-serif;line-height:1.55}
+.wrap{max-width:740px;margin:0 auto;padding:0 16px 90px}
+.hud{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:2px solid var(--line);padding:8px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hud .sc{display:flex;flex-direction:column;line-height:1.1}
+.hud .sc small{font-size:.7rem;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.hud .sc b{font-size:1.6rem}
+.hud .lv{flex:1;min-width:120px;font-size:.85rem}
+.hud .td{font-size:.85rem;color:var(--mute)}
+.hud .blocks{margin:2px 0 0}
+.hud button{min-height:44px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;font-weight:700;cursor:pointer;padding:4px 12px}
+.hud button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#pop{position:absolute;left:0;top:100%;pointer-events:none;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding-top:6px}
+.pp{background:var(--accent);color:var(--accent-ink);font-weight:700;border-radius:8px;padding:4px 12px;font-size:.9rem;animation:rise 1.8s ease forwards}
+@keyframes rise{0%{opacity:0;transform:translateY(8px)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+header{padding:10px 0 0}
+header h1{font-size:1.25rem;margin:0}
+header .sub{color:var(--mute);font-size:.85rem}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}
+nav button{flex:1 1 auto;min-height:48px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;font-weight:700;cursor:pointer;padding:6px 10px}
+nav button[aria-current=page]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stage{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}
+#owl{flex:0 0 92px;padding-top:4px}
+#owl svg{width:92px;height:88px;display:block;shape-rendering:crispEdges}
+#owl.hop svg{animation:hop .45s ease 3}
+#owl.bob svg{animation:bob 3.2s ease-in-out infinite}
+#owl.tilt svg{transform:rotate(-10deg)}
+@keyframes hop{50%{transform:translateY(-9px)}}
+@keyframes bob{50%{transform:translateY(-2px)}}
+.sbox{flex:1}
+#bubble{position:relative;margin:0 0 8px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 14px;font-size:.95rem}
+#bubble::before{content:"";position:absolute;left:-10px;top:18px;border:8px solid transparent;border-right-color:var(--line);border-left:0}
+.sbtns button{min-height:44px;border:2px solid var(--accent);background:transparent;color:var(--accent);border-radius:10px;font:inherit;font-weight:700;cursor:pointer;padding:4px 14px;margin:0 8px 6px 0}
+.scene{border:2px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--accent) 9%,var(--card));margin-bottom:14px;overflow:hidden}
+.scene svg{display:block;width:100%;height:auto;max-height:110px;shape-rendering:crispEdges}
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.chat{border-color:var(--accent)}
+.log{max-height:240px;overflow-y:auto;padding-right:4px}
+.msg{margin:6px 0;padding:8px 12px;border-radius:12px;max-width:92%;font-size:.95rem}
+.msg.owl{background:var(--soft)}
+.msg.you{background:var(--accent);color:var(--accent-ink);margin-left:auto}
+.chips button{min-height:44px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 14px;font:inherit;cursor:pointer;margin:4px 6px 4px 0}
+.chips button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.askrow{display:flex;gap:8px;margin-top:8px}
+.askrow input{flex:1}
+h2{font-size:1.35rem;margin:0 0 8px}
+h2.sec{margin:22px 0 8px}
+h3{font-size:1.1rem;margin:16px 0 6px}
+p{margin:8px 0}
+.mute{color:var(--mute)}.small{font-size:.85rem}
+button.btn,a.btn{display:inline-block;min-height:52px;padding:10px 20px;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;cursor:pointer;text-decoration:none;margin:6px 8px 6px 0}
+button.btn.alt{background:transparent;color:var(--accent)}
+button.btn:disabled{opacity:.5;cursor:default}
+.blocks{display:flex;gap:4px;margin:4px 0 12px}
+.blocks i{width:18px;height:10px;background:var(--line);display:block}
+.blocks i.on{background:var(--accent)}
+.tag{display:inline-block;font-size:.78rem;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:var(--mute);margin:0 6px 6px 0}
+.tag.v{border-color:var(--know);color:var(--know)}
+.tip{background:var(--soft);border-left:5px solid var(--accent);padding:10px 14px;border-radius:6px;margin:12px 0}
+.warn{border:2px solid var(--review);padding:8px 12px;border-radius:8px;margin:10px 0}
+ol.chain{list-style:none;margin:12px 0;padding:0}
+ol.chain li{position:relative;border:2px solid var(--accent);background:var(--soft);padding:8px 12px;margin:0 0 18px 0;border-radius:6px;font-weight:700}
+ol.chain li:not(:last-child)::after{content:"\2193";position:absolute;left:14px;bottom:-22px;color:var(--accent);font-size:1.1rem}
+.qtext{font-size:1.2rem;font-weight:700;margin:6px 0 14px}
+.choice{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;min-height:56px;margin:8px 0;padding:12px 14px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;cursor:pointer}
+.choice .n{flex:0 0 28px;height:28px;border-radius:6px;border:2px solid var(--mute);display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.choice:hover:not(:disabled){border-color:var(--accent)}
+.choice.right{border-color:var(--know);border-width:3px}
+.choice.wrong{border-color:var(--revisit);border-width:3px}
+.choice .mk{display:block;font-weight:700;font-size:.85rem;margin-top:2px}
+.choice:disabled{cursor:default;color:var(--ink)}
+.fb{margin-top:10px}
+.pill{display:inline-block;border-radius:999px;padding:2px 12px;font-size:.85rem;font-weight:700;border:2px solid currentColor}
+.pill.know{color:var(--know)}.pill.review{color:var(--review)}.pill.revisit{color:var(--revisit)}.pill.new{color:var(--mute)}
+.mod{display:flex;flex-direction:column;gap:6px}
+.bar{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--know)}
+input[type=search],input[type=text],textarea,select{width:100%;font:inherit;padding:10px 12px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+.term{border-top:1px solid var(--line);padding:10px 0}
+.term b{font-size:1.05rem}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+td,th{border-top:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+label.row{display:flex;gap:12px;align-items:center;min-height:48px}
+label.row input{width:24px;height:24px}
+.cols{columns:2 240px;column-gap:24px}
+.cols div{break-inside:avoid;margin-bottom:6px}
+.flash{text-align:center}
+.flash .big{font-size:2rem;font-weight:700;margin:14px 0}
+.tiles{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.tiles i{font-style:normal;font-size:.7rem;padding:3px 6px;border:2px solid var(--line);border-radius:4px;color:var(--mute)}
+.tiles i.know{border-color:var(--know);color:var(--know);font-weight:700}
+.tiles i.review{border-color:var(--review);color:var(--review)}
+.tiles i.revisit{border-color:var(--revisit);color:var(--revisit)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mgrid button{min-height:56px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;cursor:pointer;padding:8px 10px;text-align:left}
+.mgrid button.sel{border-color:var(--accent);border-width:3px}
+.mgrid button.ok{border-color:var(--know);color:var(--know);font-weight:700}
+details summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+.cert{border:6px double var(--accent);padding:28px 18px;text-align:center}
+.cert .name{font-size:1.8rem;font-weight:700;margin:10px 0;border-bottom:2px solid var(--line);display:inline-block;min-width:60%}
+.cert svg{width:64px;height:62px;shape-rendering:crispEdges}
+footer{font-size:.8rem;color:var(--mute);margin-top:24px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+body.still *{animation:none!important}
+@media print{
+ body{background:#fff;color:#000}
+ .hud,header,nav,.stage,#chat,footer,.noprint,button,.scene,details{display:none!important}
+ #app>.card:not(.printable){display:none!important}
+ .card{border:0;padding:0;margin:0 0 10px}
+ .cert{border:6px double #000;padding:30px}
+ .wrap{padding:0;max-width:none}
+ html{font-size:12px}
+ textarea{border:1px solid #888;min-height:50px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud" id="hud" role="region" aria-label="Your score">
+    <div class="sc"><small>Score</small><b id="score">0</b></div>
+    <div class="lv"><span id="lvname"></span><div class="blocks" id="lvblocks" aria-hidden="true"></div></div>
+    <div class="td">Today <b id="today">+0</b></div>
+    <button id="soundbtn" data-act="sound" aria-pressed="false">Sound: off</button>
+    <div id="pop" role="status"></div>
+  </div>
+  <header><h1>Owlchi</h1><div class="sub" id="ctitle"></div></header>
+  <nav id="nav" aria-label="Sections"></nav>
+  <div class="stage" id="stage">
+    <div id="owl" role="img" aria-label="Owlchi, a pixel owl helper"></div>
+    <div class="sbox">
+      <p id="bubble" aria-live="polite"></p>
+      <div class="sbtns"><button data-act="chat">Ask Owlchi</button><button data-act="tip">Tip</button></div>
+    </div>
+  </div>
+  <div id="chat" class="card chat" hidden></div>
+  <main id="app"></main>
+  <footer>Progress is saved on this device only. Facts tagged "Checked" were verified against public sources on 2026-10-04. Everything else is general knowledge: confirm before quoting it. Self-study tool, not affiliated with or endorsed by Qcells or Hanwha. MIT License.</footer>
+</div>
+
+<script>
+(function(){
+var BUILTIN = {
+id:"qcells-risk-lead",
+title:"Risk Lead in Solar + Storage: intro and interview prep",
+certTitle:"Introduction to Risk Management in Solar and Battery Infrastructure",
+modules:[
+ {id:"m0",kind:"core",title:"Big picture: who is who",blurb:"No background needed. The whole system in five minutes.",terms:["Grid","Utility","Load","Developer","Operator"]},
+ {id:"m1",kind:"core",title:"What is Qcells?",blurb:"Who they are, what they build, and one real news event.",terms:["EPC","Vertical integration","Ingot","UFLPA","CBP","Furlough"]},
+ {id:"m2",kind:"core",title:"Electricity basics",blurb:"Volts, amps, MW vs MWh, DC vs AC.",terms:["MW","MWh","GW","DC","AC","MWdc / MWac"]},
+ {id:"m3",kind:"core",title:"Solar panels 101",blurb:"From sunlight to the grid, step by step.",terms:["PV","Module (panel)","Inverter","String","Tracker","Capacity factor"]},
+ {id:"m4",kind:"core",title:"Battery storage (BESS) hookup",blurb:"Every component, in order.",terms:["BESS","BMS","PCS","EMS","LFP","SOC"]},
+ {id:"m5",kind:"core",title:"SCADA deep dive",blurb:"How operators watch and control a plant.",terms:["SCADA","HMI","PLC","RTU","PPC","Historian"]},
+ {id:"m6",kind:"core",title:"IT vs OT vs OTA",blurb:"Three look-alike terms, and security.",terms:["IT","OT","OTA","DMZ","Segmentation"]},
+ {id:"m7",kind:"core",title:"Project words",blurb:"Phases, contracts, grid connection, money.",terms:["POI","COD","PPA","LNTP","LDs","Contingency"]},
+ {id:"m8",kind:"core",title:"Risk basics",blurb:"How a Risk Lead thinks and talks.",terms:["Risk register","Likelihood","Impact","Mitigation","Residual risk","Leading indicator"]},
+ {id:"d1",kind:"explore",title:"Deep dive: three-phase and voltage levels",blurb:"Why plants step voltage up, and what that means for risk.",terms:["Three-phase","kV","Medium voltage","High voltage","Collector substation"]},
+ {id:"d2",kind:"explore",title:"Deep dive: protection and grounding",blurb:"Fuses, breakers, relays, faults, and safety.",terms:["Fault","Breaker","Relay","Fuse","Grounding","Arc flash"]},
+ {id:"d3",kind:"explore",title:"Deep dive: reading a one-line diagram",blurb:"The electrical map of a plant.",terms:["One-line diagram","Bus","Feeder","As-built"]},
+ {id:"d4",kind:"explore",title:"Deep dive: the grid, frequency, and inverters",blurb:"Why solar and batteries behave differently from spinning generators.",terms:["Frequency","Inertia","IBR","Grid-following","Grid-forming","Reactive power"]},
+ {id:"e1",kind:"explore",title:"Interview toolkit",blurb:"How to tell your story and handle unknown terms.",terms:["STAR","Behavioral question","Follow-up question"]}
+],
+lessons:{
+ m0:[
+  {t:"The big idea",tag:"g",chain:["Sun or battery","Panels or battery racks","Inverter or PCS (converts power)","Transformer (raises voltage)","Grid (the shared network)","Homes and businesses (the load)"],b:["Solar panels make electricity. Batteries store it.","Wires, transformers, and switches carry it to the grid.","People and software watch it and keep it safe."]},
+  {t:"Who is who",tag:"g",b:["Developer: finds the site, gets permits and grid permission.","Owner or investor: pays for the plant and owns it.","EPC contractor: designs it, buys the equipment, builds it.","Equipment makers: panels, batteries, inverters.","Utility or grid operator: runs the grid the plant connects to.","Operator: runs and repairs the plant after it is built."],tip:"One company can play several roles. Qcells makes panels and does EPC work, and has also developed projects."},
+  {t:"Why risk matters",tag:"g",b:["These projects are big, expensive, and take years.","Delays, defects, and surprises cost money and can hurt safety.","A Risk Lead asks: what could go wrong, and who owns the fix?"]},
+  {t:"Words you will meet first",tag:"g",b:["MW: how fast power flows. MWh: how much energy is stored.","EPC: engineering, procurement, construction.","BESS: a big battery plant. SCADA: the screens that run it.","POI: the spot where the plant meets the grid."],tip:"Do not memorize these now. Each gets its own lesson."},
+  {t:"How this course works",tag:"g",b:["Each topic has a lesson, a few key terms, and a short quiz.","Say \"Not yet\" when you do not know a term. That is how learning works.","Your owl helper can explain anything. Tap Ask Owlchi."]}
+ ],
+ m1:[
+  {t:"The short version",tag:"v",b:["Qcells makes solar panels.","It also designs and builds whole solar power plants, and big battery plants.","Its US business for this work is based in Houston."]},
+  {t:"EPC: the key word",tag:"v",b:["EPC = Engineering, Procurement, Construction.","Engineering: design it. Procurement: buy the equipment. Construction: build it.","Qcells does all three, and makes many of its own panels."]},
+  {t:"The factories",tag:"v",b:["Two factories in Georgia: Dalton and Cartersville.","Cartersville is built to make the whole chain: ingot, wafer, cell, module. Making every step in-house is called vertical integration.","Company target: about 8.6 GW of panels a year by the end of Q3 2026. One outlet says 8.4 GW. If unsure, say \"roughly 8.5 GW\".","GW = gigawatt = 1,000 megawatts."]},
+  {t:"A real project: Atlas V and VI",tag:"v",b:["Two solar plants in Arizona, about 372 MWdc together (237 + 135).","Qcells developed them, sold them, then did the EPC work and supplied panels and racking.","Power is sold under long-term contracts to Southern California Edison.","One buyer announcement lists about 357 MWdc. Numbers differ by source."]},
+  {t:"What happened, in order",tag:"v",chain:["2025: US Customs starts holding imported solar cells","Why it hurt: Georgia panel lines needed cells that came from overseas","Nov 2025: Qcells furloughs 1,000 Georgia workers","Mar 2026: normal production returns"],b:["UFLPA is a US law that bans imports tied to forced labor. CBP is the agency that checks imports at the border.","Qcells says its cells contained no material from the Xinjiang region."]},
+  {t:"Why this matters to a Risk Lead",tag:"g",b:["One supply link stopped, and factories slowed. That is a single point of dependency.","Early warning signs: shipment holds, requests for paperwork, rule changes.","A Risk Lead asks: what is Plan B if a shipment is stopped, and who owns it?"],tip:"In an interview, talk about the risk and the plan. Do not blame anyone."},
+  {t:"The job in one line",tag:"g",b:["Risk Lead = find what could go wrong on big projects, rate it, and make sure someone owns the fix.","You do not need to be a solar engineer. You need to ask good questions and track the answers."],tip:"Not yet checked: the job posting text itself. Save the posting and compare it to this course."}
+ ],
+ m2:[
+  {t:"Four words",tag:"g",b:["Voltage (V): the push. Like water pressure.","Current (A): the flow. Like water per second.","Power (W): how fast energy moves. Voltage x current.","Energy (Wh): power x time."]},
+  {t:"Sizes",tag:"g",b:["1 kW = 1,000 W. 1 MW = 1,000 kW. 1 GW = 1,000 MW.","Plants are measured in MW. Batteries are measured in MWh."]},
+  {t:"Power vs energy",tag:"g",b:["MW is how fast. MWh is how much.","100 MW for 4 hours = 400 MWh."],tip:"Car picture: MW is how hard you press the gas. MWh is the size of the fuel tank."},
+  {t:"DC vs AC",tag:"g",b:["DC flows one way: solar panels, batteries.","AC flips back and forth: the grid, wall outlets.","An inverter (or PCS) converts between them."]},
+  {t:"MWdc vs MWac",tag:"g",b:["MWdc = the panel rating.","MWac = what the inverters can send to the grid.","MWdc is usually bigger than MWac."],tip:"Always ask which one a number means."},
+  {t:"If you know building systems",tag:"g",b:["Breakers, transformers, and switchgear work the same way in a plant as in a large building. The plant is just bigger."]}
+ ],
+ m3:[
+  {t:"The whole chain",tag:"g",chain:["Sun","Cell","Panel (module)","String of panels","Combiner box","Inverter (DC to AC)","Transformer","Substation","POI (connection point)","Grid"],b:["Everything before the inverter is DC."]},
+  {t:"Cell, panel, string",tag:"g",b:["PV = photovoltaic: turns light into electricity.","Many cells make one panel (also called a module).","Panels wired in a row make a string."]},
+  {t:"Inverter",tag:"g",b:["Changes DC to AC.","Modern inverters also help hold grid voltage steady."]},
+  {t:"Racking and trackers",tag:"g",b:["Racking: the steel frame holding panels.","Tracker: a motor that tilts panels to follow the sun.","More energy, but more moving parts to maintain."]},
+  {t:"Qcells cell technology",tag:"v",b:["Q.ANTUM = Qcells' PERC cell (older, p-type).","Q.ANTUM NEO = Qcells' n-type TOPCon cell (newer).","The Q.TRON panel line uses NEO."],tip:"You do not need the physics. Know the names and that NEO is the newer one."},
+  {t:"Output in real life",tag:"g",b:["Capacity factor: share of maximum output actually produced over a year. Solar is well below 100% (night, clouds). Roughly a quarter is common in the US; it varies.","Degradation: panels lose a little output each year.","Qcells states its Q.TRON panel keeps at least 90.58% of rated power at 25 years."]},
+  {t:"What can go wrong",tag:"g",b:["Hail or wind damage. Tracker faults. Inverter faults. Wiring faults. Shading.","Late deliveries. Tariffs. Customs holds."],tip:"This is a Risk Lead's list. Every item can go in a risk register."}
+ ],
+ m4:[
+  {t:"What a BESS does",tag:"g",b:["Stores energy when power is plentiful (often midday solar).","Sends it out when needed (often the evening peak).","Also helps keep the grid steady."]},
+  {t:"The chain, in order",tag:"g",chain:["Cells","Modules","Racks (in a container or cabinet)","PCS: converts DC and AC","Transformer: raises voltage","Switchgear: breakers and protection","POI: connection point","Grid"],b:["Controls sit on top: BMS, EMS, SCADA."]},
+  {t:"BMS vs EMS vs SCADA",tag:"g",b:["BMS: protects the battery, cell by cell.","EMS: decides when to charge and discharge.","SCADA: lets people watch and command it all."],warn:"BMS in buildings means Building Management System. In a battery it means Battery Management System."},
+  {t:"Support systems",tag:"g",b:["HVAC or liquid cooling keeps batteries in a safe temperature range.","Fire detection and suppression. Ventilation. Backup power for controls."],tip:"If cooling fails, risk goes up fast. Ask how it is monitored."},
+  {t:"Chemistry and thermal runaway",tag:"g",b:["LFP = lithium iron phosphate. A common grid battery chemistry, generally more thermally stable than some others.","Thermal runaway: one cell overheats, heats its neighbors, and the heat spreads in a chain."]},
+  {t:"AC-coupled vs DC-coupled",tag:"v",b:["AC-coupled: the battery has its own inverter and connects on the AC side. Easy to add to existing solar.","DC-coupled: the battery shares the solar inverter on the DC side.","Qcells' home battery, Q.HOME CORE G3, is AC-coupled and uses LFP."]},
+  {t:"Safety standards",tag:"g",b:["UL 9540: standard for energy storage systems.","UL 9540A: a test for how fire spreads between cells.","NFPA 855: rules for installing stationary storage."],tip:"Know the names. Verify details before quoting them."},
+  {t:"Numbers to know",tag:"g",b:["Duration: a 4-hour battery runs full power for 4 hours.","Round-trip efficiency: energy out divided by energy in. Always under 100%.","SOC = state of charge (fuel gauge). SOH = state of health (capacity left)."]}
+ ],
+ m5:[
+  {t:"What SCADA is",tag:"g",b:["SCADA = Supervisory Control and Data Acquisition.","Software and hardware to watch and control equipment spread over a site.","Supervisory: people oversee. Data acquisition: collect readings."]},
+  {t:"The layers",tag:"g",chain:["Sensors, meters, relays, inverters","Controllers: PLC and RTU","Network","SCADA server","HMI screens and historian"],b:["Data flows up. Commands flow down."]},
+  {t:"Words you will hear",tag:"g",b:["Tag: one named data point, like Inverter 3 temperature.","Setpoint: a target value sent down.","Alarm: needs attention.","Historian: stores values over time.","HMI: the operator screen.","Trend: a graph over time."]},
+  {t:"Device languages",tag:"g",b:["Devices talk using protocols, such as Modbus and DNP3. Substations often use IEC 61850.","Different vendors, different protocols: integration work, and risk."],tip:"Verify protocol details before quoting."},
+  {t:"Plant controller and the grid",tag:"g",b:["PPC (Power Plant Controller) makes the whole plant behave: limit output, hold voltage, follow grid commands.","Curtailment: the grid operator asks the plant to cut output."]},
+  {t:"If you know building automation",tag:"g",b:["Building automation has devices, controllers, front-end graphics, alarms, and trends.","SCADA is the same pattern."],tip:"Same architecture, different vocabulary."},
+  {t:"What can go wrong",tag:"g",b:["Lost communications: operators lose sight or control.","Tag mapping errors found late. Alarm floods. Clocks not synced. Firmware mismatches.","Careless remote access. No tested safe state when comms drop. Gaps between vendors."],tip:"Each of these is a ready-made risk register entry."}
+ ],
+ m6:[
+  {t:"IT vs OT",tag:"g",b:["IT = Information Technology: data, email, business systems. Protect secrecy.","OT = Operational Technology: runs physical equipment. Protect safety and uptime.","SCADA is OT."]},
+  {t:"Convergence",tag:"g",b:["Connecting IT and OT gives useful data and dashboards.","It also opens a path for attackers toward physical equipment."],tip:"People who understand both sides are valuable."},
+  {t:"Why OT is different",tag:"g",b:["You cannot just reboot a running plant.","Devices last 15 to 30 years. Vendors control updates. Patching needs outage windows."]},
+  {t:"Basic defenses",tag:"g",b:["Segmentation: separate networks so trouble does not spread.","A firewall or DMZ between IT and OT. Least privilege. Controlled remote access.","Logging, backups, a tested incident plan.","Standards to know by name: IEC 62443 and NERC CIP. Verify where they apply."]},
+  {t:"OTA is different",tag:"v",b:["OTA = Over-the-Air update: software or firmware pushed to a device remotely.","OTA is NOT the same as OT.","Example: Qcells' Q.HOME CORE G3 gets automatic OTA updates."],warn:"OT and OTA look alike. OT = the systems. OTA = how an update arrives."},
+  {t:"OTA risks and controls",tag:"g",b:["Risk: a bad update breaks many devices at once. A fake update gets installed. No way to roll back.","Controls: sign updates, test first, roll out in stages, keep a rollback, require approvals."]},
+  {t:"Say it simply",tag:"g",b:["OT first priority is safety and uptime. IT first priority is protecting data.","A good risk person helps both sides speak the same language."]}
+ ],
+ m7:[
+  {t:"Project phases",tag:"g",chain:["Develop: site, permits, grid application","Design (engineering)","Procure: buy equipment","Construct","Commission: test","COD: start selling power","Operate (O&M)"]},
+  {t:"Contract words",tag:"g",b:["NTP: written go-ahead to start. LNTP: go-ahead for limited early work.","PPA: contract to buy the power.","Change order: formal change to scope, price, or schedule.","Punch list: small leftover items. Substantial completion: usable, minor items left."]},
+  {t:"Money and time words",tag:"g",b:["Contingency: money or time set aside for expected unknowns.","EAC: forecast of final cost. ETC: forecast of cost still to spend.","Critical path: the chain of tasks that sets the finish date. Float: slack time.","LDs: liquidated damages, a penalty set in advance for delay or underperformance."]},
+  {t:"Connecting to the grid",tag:"g",b:["Interconnection: applications, studies, upgrades, agreements, then the physical connection at the POI.","Interconnection queue: the waiting line. A delay here delays everything.","ERCOT runs most of Texas. CAISO runs most of California (Atlas V and VI supply CAISO)."]},
+  {t:"Buying equipment",tag:"g",b:["RFQ: ask for a price. RFI: ask a clarifying question.","Long-lead items (transformers, switchgear, batteries) can take many months. A classic schedule risk."]},
+  {t:"Commissioning",tag:"g",b:["Steps: mechanical completion, energize, functional tests, performance tests, then COD.","Problems found late cost the most."]},
+  {t:"Warranties",tag:"v",b:["Equipment warranty: the maker fixes the product.","Workmanship warranty: the builder fixes the install.","Performance warranty: a promised output level.","Qcells EPC job listings describe warranty work across solar, BESS, and balance-of-plant."]}
+ ],
+ m8:[
+  {t:"Risk vs issue",tag:"g",b:["Risk: something that might happen and hurt cost, schedule, safety, or quality.","Issue: it already happened."]},
+  {t:"Three kinds named in the job",tag:"g",b:["Execution: can we build it on plan?","Cost: will the money hold?","Technical: will the design and equipment work?"],tip:"The posting reportedly leads with these three. Confirm against the posting."},
+  {t:"One risk register row",tag:"g",chain:["Risk (one clear sentence)","Trigger (the early sign)","Impact (cost, time, safety)","Likelihood and score","Owner (one person)","Mitigation (the action)","Evidence it is working","Status and escalation"]},
+  {t:"Score and responses",tag:"g",b:["Score = likelihood x impact (each 1 to 5).","Four responses: avoid, reduce, transfer (contract or insurance), accept.","Residual risk: what is left after the action."]},
+  {t:"Evidence over assurance",tag:"g",b:["Ask: is the mitigation really reducing risk, or is someone just saying it is?","Leading indicator: an early sign, like a supplier shipment slipping. Lagging indicator: a result, like final cost."]},
+  {t:"Worked example: customs hold",tag:"g",b:["Risk: imported cells are detained at the port.","Trigger: a customs detention notice.","Impact: factory slows, projects slip.","Mitigation ideas: supplier paperwork and traceability, buffer stock, a second supplier, making more in-house.","Residual: lower, not zero."],tip:"The event is real (checked). The mitigation list is an example of how to think."},
+  {t:"When the team disagrees",tag:"g",b:["Ask for the evidence and the assumptions.","Write the disagreement down.","If it stays open, escalate with facts, not opinions."]},
+  {t:"Use your own experience",tag:"g",b:["Running any live operation means managing failure modes. That is risk work.","Describe your real examples with the same method: risk, trigger, impact, action, result."],tip:"Do not invent experience you do not have."}
+ ],
+ d1:[
+  {t:"Three-phase in plain words",tag:"g",b:["Large power systems use three AC waves, offset in time, on three wires.","The result is smoother power, and big equipment runs better on it.","The grid, big transformers, and utility inverters are three-phase. Home outlets are usually single-phase."],tip:"If a nameplate says 3-phase, it is grid-scale equipment."},
+  {t:"Low, medium, and high voltage",tag:"v",b:["Low voltage (under 1 kV): near the panels and inverters.","Medium voltage (about 1 to 35 kV): the collection lines inside the plant. 34.5 kV is common.","High voltage (above that, such as 115 to 345 kV): transmission lines.","kV = kilovolt = 1,000 volts."],tip:"Typical values. Each project differs."},
+  {t:"The voltage staircase",tag:"v",chain:["Panels and inverters: low voltage","Pad-mount transformers: step up to about 34.5 kV","Collection lines carry 34.5 kV across the field","Collector substation: steps up to transmission voltage","POI and the grid"],b:["Example: one 300 MW plant steps 34.5 kV up to 345 kV for interconnection."]},
+  {t:"Why higher voltage?",tag:"g",b:["Power = voltage x current.","The same power at higher voltage needs less current.","Less current means less heat loss and thinner wire."],tip:"Callback: this is the V x I from the electricity lesson."},
+  {t:"Why a Risk Lead cares",tag:"v",b:["The main step-up transformer is custom. One engineering case study cites a 62-week lead time.","One vendor estimates substations can be roughly 5 to 10 percent of a solar plant's cost.","A late transformer or substation delays the whole project."],tip:"Lead times vary. Ask for the current supplier quote."}
+ ],
+ d2:[
+  {t:"What protection does",tag:"g",b:["Protection stops damage and danger when something goes wrong.","Three steps: detect the problem, decide, interrupt the current."]},
+  {t:"Fuse, breaker, relay",tag:"g",b:["Fuse: melts once, then must be replaced.","Breaker: a switch that can open under fault current and be reset.","Relay: the brain that senses trouble and tells a breaker to open.","Switchgear holds breakers and relays."]},
+  {t:"What is a fault?",tag:"g",b:["A fault is an unwanted path for current, such as a short circuit.","Faults send huge current. Protection must clear them fast."]},
+  {t:"Grounding",tag:"g",b:["Grounding connects equipment to the earth for safety and as a reference.","Poor grounding can mean shock risk and equipment damage.","A ground fault is current going to ground where it should not."]},
+  {t:"Arc flash and lockout/tagout",tag:"g",b:["An arc flash is a violent burst of energy from an electrical fault.","Lockout/tagout keeps equipment de-energized while people work on it.","Labels, protective gear, and procedures exist because of these hazards."]},
+  {t:"Why a Risk Lead cares",tag:"g",b:["Protection settings that are wrong or untested are found late, at commissioning.","Settings must match the grid operator's requirements.","Ask for test reports as evidence, not just a promise."]}
+ ],
+ d3:[
+  {t:"What it is",tag:"g",b:["A one-line (single-line) diagram draws a three-phase system as one line per connection.","It is the electrical map of the plant."]},
+  {t:"Symbols you will see",tag:"g",b:["Transformer: two linked circles.","Breaker: a small box on a line.","Bus: a thick bar where circuits join.","Feeder: a line leaving the bus to equipment.","Ground: three shrinking lines."],tip:"Drawing styles vary. Always check the legend."},
+  {t:"Read it left to right",tag:"g",b:["Start at the generation (panels, inverters) and follow the line to the POI.","At each box ask: what is it, what protects it, who owns it?"]},
+  {t:"The ownership line",tag:"g",b:["The diagram shows where the plant ends and the utility begins, usually near the POI.","The meter location matters for billing and responsibility.","Check the interconnection agreement for the exact line."]},
+  {t:"Why a Risk Lead cares",tag:"g",b:["Drawings go stale. A mismatch between diagram and field is a risk.","As-built drawings show what was actually built.","Design changes should update the diagram, with a record."]}
+ ],
+ d4:[
+  {t:"The 60 Hz heartbeat",tag:"v",b:["The North American grid runs at 60 Hz (cycles per second).","Even small deviations matter. They can trigger protection systems and cause outages.","Frequency stays near 60 only when supply and demand stay balanced."]},
+  {t:"Inertia",tag:"v",b:["Spinning generators (gas, coal, nuclear, hydro) store motion energy.","That inertia resists sudden frequency changes and buys time.","Solar and batteries connect through inverters and do not provide inertia on their own."]},
+  {t:"Inverter-based resources (IBRs)",tag:"v",b:["Solar, wind, and batteries connect through power electronics.","They behave differently from spinning generators. That does not make them bad for reliability.","If equipped and coordinated, they can supply fast frequency response."]},
+  {t:"Grid-following vs grid-forming",tag:"v",b:["Grid-following inverters sync to the grid signal that already exists.","Grid-forming inverters can help create that signal and limit frequency swings.","Grid-forming is newer. Grid operators, including ERCOT, are working on specifications."]},
+  {t:"Ride-through",tag:"v",b:["Plants must stay online through certain voltage and frequency dips. NERC's PRC-024 sets ride-through requirements.","NERC and WECC found solar plants dropping offline during disturbances because of inverter settings."],tip:"Settings errors are a real risk, not a theory."},
+  {t:"Reactive power",tag:"g",b:["Reactive power helps support voltage.","Grid rules often require plants to supply it within a set range, such as a power factor range.","The range is set by the grid operator. Check the local rule."]},
+  {t:"Why a Risk Lead cares",tag:"g",b:["Failing grid-code tests can delay COD.","Settings that do not match the studies cause trips and penalties.","Rule changes (like grid-forming specs) can change requirements mid-project."]}
+ ],
+ e1:[
+  {t:"STAR in four words",tag:"g",b:["Situation: the setting. Task: your job in it.","Action: what you did. Result: what happened.","Tell it as a short story. End with a result, ideally a number."]},
+  {t:"Tell me about yourself",tag:"g",b:["Three parts: where you are now, how you got here, why this role.","Keep it to 60 to 90 seconds."]},
+  {t:"When you do not know a term",tag:"g",b:["Say what you do know, connect it to something you have used, and ask how they use it.","Example: I have not used that term. The closest thing I know is ___. How do you use it here?"]},
+  {t:"Use your own examples",tag:"g",b:["Prepare three real stories: you challenged an assumption, a team disagreed with you, you prevented a failure.","The Cheat sheet has boxes to save them."]},
+  {t:"Questions to ask them",tag:"g",b:["What are your top three risks right now?","How are risks tracked and reviewed?","What does success look like in 90 days?"]},
+  {t:"What not to do",tag:"g",b:["Do not invent experience.","Do not blame past employers.","Do not guess a number. Say you would verify it."]}
+ ]
+},
+questions:[
+ {id:"q001",m:"m0",q:"Who designs, buys equipment for, and builds a power plant?",a:["The EPC contractor","The utility customer","The grid inspector","The panel recycler"],why:"EPC = Engineering, Procurement, Construction.",l:1},
+ {id:"q002",m:"m0",q:"Who runs the shared network of power lines?",a:["The utility or grid operator","The developer","The EPC contractor","The panel maker"],why:"Plants connect to the grid. They do not run it.",l:1},
+ {id:"q003",m:"m0",q:"What does a developer do?",a:["Finds the site and gets permits and grid permission","Installs the panels","Runs the plant every day","Makes the batteries"],why:"Developers start the project before design and construction.",l:1},
+ {id:"q004",m:"m0",q:"What does a Risk Lead ask along the whole path?",a:["What could go wrong, and who owns the fix?","How cheap are the panels?","What color is the fence?","Who designed the logo?"],why:"Spot, rate, assign an owner, track the fix.",l:2},
+ {id:"q005",m:"m0",q:"A \"load\" is:",a:["Anything that uses electricity","A type of battery","A type of transformer","A solar panel"],why:"Homes and businesses are the load on the grid.",l:0},
+ {id:"q101",m:"m1",q:"What does Qcells' EPC business do?",a:["Designs, buys equipment for, and builds power plants","Only sells rooftop panels","Only runs the power grid","Only makes phone batteries"],why:"EPC = Engineering, Procurement, Construction.",l:1},
+ {id:"q102",m:"m1",q:"Where is Qcells USA headquartered?",a:["Houston, Texas","Atlanta, Georgia","Phoenix, Arizona","Austin, Texas"],why:"Qcells USA is Houston-based. Georgia is where the factories are.",l:0},
+ {id:"q103",m:"m1",q:"Where are Qcells' big US factories?",a:["Georgia: Dalton and Cartersville","Arizona","Texas","Nevada"],why:"Arizona is where the Atlas V and VI projects were built.",l:2},
+ {id:"q104",m:"m1",q:"What slowed Qcells' Georgia factories in 2025?",a:["Customs held up imported solar cells","A hurricane","A worker strike","A factory fire"],why:"CBP detained cells under UFLPA. 1,000 workers were furloughed in Nov 2025. Normal production returned in March 2026.",l:4},
+ {id:"q105",m:"m1",q:"Atlas V and VI in Arizona total about:",a:["372 MWdc","37 MWdc","3,720 MWdc","12 MWdc"],why:"237 + 135 = 372 MWdc. One buyer announcement says about 357 MWdc, so numbers differ by source.",l:3},
+ {id:"q106",m:"m1",q:"What does a Risk Lead mainly do?",a:["Finds what could go wrong, rates it, and tracks fixes","Installs rooftop panels","Sells panels to customers","Writes patents"],why:"Spot, rate, assign an owner, track the mitigation.",l:6},
+ {id:"q107",m:"m1",q:"The customs hold is a good example of:",a:["A single point of dependency","A design error","A tax credit","A weather event"],why:"One supply link stopped and output slowed.",l:5},
+ {id:"q201",m:"m2",q:"A battery is 100 MW and 400 MWh. What does 400 MWh tell you?",a:["How much energy it can store","How fast it can charge","Its voltage","Its weight"],why:"MWh is energy (how much). MW is power (how fast).",l:2},
+ {id:"q202",m:"m2",q:"100 MW for 4 hours equals:",a:["400 MWh","25 MWh","104 MWh","100 MWh"],why:"Power x time = energy. 100 x 4 = 400.",l:2},
+ {id:"q203",m:"m2",q:"Which source produces DC power?",a:["A solar panel","The utility grid","A wall outlet","A transmission line"],why:"Panels and batteries are DC. The grid is AC.",l:3},
+ {id:"q204",m:"m2",q:"MWac is:",a:["What the inverters can send to the grid","The panel rating in full sun","The battery size","The battery voltage"],why:"MWdc = panels. MWac = after the inverters. Ask which one a number means.",l:4},
+ {id:"q205",m:"m2",q:"Voltage is most like:",a:["Water pressure","Water used per hour","Pipe length","Tank size"],why:"Voltage is the push. Current is the flow.",l:0},
+ {id:"q206",m:"m2",q:"1 GW equals:",a:["1,000 MW","100 MW","10,000 MW","1,000,000 MW"],why:"kW, MW, GW each step up by 1,000.",l:1},
+ {id:"q301",m:"m3",q:"Which order is correct for a solar plant?",a:["Panels, inverter, transformer, grid","Grid, inverter, panels, transformer","Inverter, panels, grid, transformer","Panels, grid, inverter, transformer"],why:"DC panels feed the inverter, then AC goes through the transformer to the grid.",l:0},
+ {id:"q302",m:"m3",q:"What does an inverter do?",a:["Changes DC to AC","Stores energy","Cools the panels","Measures sunlight"],why:"Panels make DC. The grid uses AC.",l:2},
+ {id:"q303",m:"m3",q:"Which Qcells name is the n-type TOPCon cell?",a:["Q.ANTUM NEO","Q.ANTUM","Q.HOME CORE","Q.OMMAND"],why:"Q.ANTUM is PERC. Q.ANTUM NEO is the newer n-type TOPCon. Q.HOME CORE is a battery. Q.OMMAND is an app.",l:4},
+ {id:"q304",m:"m3",q:"A tracker does what?",a:["Tilts panels to follow the sun","Finds lost panels","Measures voltage","Stores power"],why:"More energy, but more moving parts to maintain.",l:3},
+ {id:"q305",m:"m3",q:"Degradation means:",a:["Panels slowly lose output over the years","Panels break all at once","Panels get cheaper","Panels turn into AC"],why:"Warranties guarantee a minimum output after many years.",l:5},
+ {id:"q306",m:"m3",q:"Capacity factor is:",a:["Share of maximum output actually produced over time","Number of panels","Panel size","Inverter price"],why:"Solar is well below 100% because of night and clouds.",l:5},
+ {id:"q307",m:"m3",q:"A string is:",a:["Several panels wired in a row","A battery","A cable to the grid","A type of inverter"],why:"Strings feed combiner boxes, which feed inverters.",l:1},
+ {id:"q401",m:"m4",q:"What does the BMS watch in a battery?",a:["Cell voltage and temperature","Grid prices","Panel angle","Building lights"],why:"Battery Management System. In buildings, BMS means Building Management System.",l:2},
+ {id:"q402",m:"m4",q:"What does the PCS do?",a:["Converts DC to AC and AC to DC","Stores energy","Fights fires","Sells power"],why:"Power Conversion System.",l:1},
+ {id:"q403",m:"m4",q:"Which order is correct for a BESS?",a:["Racks, PCS, transformer, switchgear, POI, grid","Grid, POI, racks, PCS","Racks, grid, PCS, transformer","Transformer, racks, PCS, grid"],why:"DC batteries, convert to AC, raise voltage, protect, connect.",l:1},
+ {id:"q404",m:"m4",q:"AC-coupled battery means:",a:["It has its own inverter on the AC side","It shares the solar DC bus","It has no inverter","It needs no BMS"],why:"DC-coupled shares the solar inverter. Qcells Q.HOME CORE G3 is AC-coupled.",l:5},
+ {id:"q405",m:"m4",q:"Thermal runaway is:",a:["A cell overheating and heating its neighbors in a chain","Fast charging","A cooling mode","A software update"],why:"This is why cooling, spacing, and fire design matter.",l:4},
+ {id:"q406",m:"m4",q:"Which system decides when to charge or discharge?",a:["EMS","BMS","HVAC","POI"],why:"Energy Management System. EMS also means Emergency Medical Services elsewhere.",l:2},
+ {id:"q407",m:"m4",q:"Round-trip efficiency is below 100% because:",a:["Some energy is lost as heat when charging and discharging","Batteries leak electrons","The grid keeps some","Sunlight is lost"],why:"Energy out divided by energy in is always under 100%.",l:7},
+ {id:"q408",m:"m4",q:"Which standard tests how fire spreads between battery cells?",a:["UL 9540A","NFPA 70","IEEE 802","ISO 9001"],why:"UL 9540A is the test method. Verify details before quoting.",l:6},
+ {id:"q501",m:"m5",q:"What does SCADA let operators do?",a:["Watch and control equipment remotely","Design panels","Pay invoices","Write contracts"],why:"Supervisory Control and Data Acquisition.",l:0},
+ {id:"q502",m:"m5",q:"Where is SCADA data stored over time?",a:["A historian","A breaker","A transformer","A tracker"],why:"The historian keeps readings for trends and investigations.",l:2},
+ {id:"q503",m:"m5",q:"Devices in SCADA talk to each other using:",a:["Protocols such as Modbus or DNP3","Only email","Only paper logs","Radio stations"],why:"Different vendors and protocols mean integration risk.",l:3},
+ {id:"q504",m:"m5",q:"A setpoint is:",a:["A target value sent to equipment","An alarm","A broken sensor","A report"],why:"Example: tell the plant to limit output to 80 MW.",l:2},
+ {id:"q505",m:"m5",q:"The grid operator asks a plant to cut output. This is:",a:["Curtailment","Degradation","Commissioning","A change order"],why:"The PPC carries out the request.",l:4},
+ {id:"q506",m:"m5",q:"What does the Power Plant Controller do?",a:["Makes the whole plant follow grid rules","Cleans panels","Tracks money","Cools batteries"],why:"Limits output, holds voltage, follows commands.",l:4},
+ {id:"q507",m:"m5",q:"Why is losing communications a risk?",a:["Operators may lose visibility or control","Panels stop existing","Batteries get cheaper","Nothing changes"],why:"Plants need a tested safe state for loss of comms.",l:6},
+ {id:"q508",m:"m5",q:"Building automation and SCADA are alike because both:",a:["Monitor and control equipment using sensors, controllers, and screens","Sell power","Are batteries","Are contracts"],why:"Same architecture, different vocabulary.",l:5},
+ {id:"q601",m:"m6",q:"OT means:",a:["Technology that controls physical equipment","Office email","Over-the-air updates","Ordering tools"],why:"Operational Technology.",l:0},
+ {id:"q602",m:"m6",q:"OTA means:",a:["Over-the-air: software pushed remotely","Operational Technology Access","Outdoor temperature alarm","On-time arrival"],why:"Not the same as OT.",l:4},
+ {id:"q603",m:"m6",q:"The top priority in OT is usually:",a:["Safety and uptime","Email speed","Marketing","A pretty screen"],why:"IT usually puts protecting data first.",l:0},
+ {id:"q604",m:"m6",q:"Why is patching OT hard?",a:["Rebooting can stop a running plant","OT has no software","Patches are free","OT is always offline"],why:"Patching needs planned outage windows.",l:2},
+ {id:"q605",m:"m6",q:"A DMZ between IT and OT is:",a:["A buffer network zone with tightly controlled traffic","A battery type","A grid rule","A solar cell"],why:"It limits what can cross between the two worlds.",l:3},
+ {id:"q606",m:"m6",q:"The biggest OTA risk is:",a:["A bad update could break many devices at once","Updates are always free","OTA only works on panels","There is no risk"],why:"Controls: signed updates, testing, staged rollout, rollback.",l:5},
+ {id:"q607",m:"m6",q:"Which Qcells product gets OTA firmware updates?",a:["Q.HOME CORE G3","A bare solar panel","A steel racking frame","A cable"],why:"Checked on Qcells' product page.",l:4},
+ {id:"q608",m:"m6",q:"Network segmentation means:",a:["Splitting networks so a problem does not spread","Cutting panels","Splitting a contract","Dividing a battery"],why:"A basic OT security control.",l:3},
+ {id:"q701",m:"m7",q:"Interconnection means:",a:["Permission and physical connection to the grid","A type of panel","A loan","Insurance"],why:"Studies, upgrades, agreements, then the physical tie-in at the POI.",l:3},
+ {id:"q702",m:"m7",q:"A PPA is:",a:["A contract to buy power on agreed terms","A panel part","A fire permit","A paint spec"],why:"Atlas V and VI sell power under long-term contracts to Southern California Edison.",l:1},
+ {id:"q703",m:"m7",q:"LNTP lets a contractor:",a:["Start limited early work before the full go-ahead","Finish the project","End the contract","Test a battery"],why:"Limited Notice to Proceed.",l:1},
+ {id:"q704",m:"m7",q:"A change order is:",a:["A formal change to scope, price, or schedule","A broken part","An alarm","A test"],why:"Track these closely. They are cost and schedule risk.",l:1},
+ {id:"q705",m:"m7",q:"Contingency is:",a:["Money or time set aside for expected unknowns","A penalty","A bonus","A permit"],why:"A Risk Lead asks if it is enough.",l:2},
+ {id:"q706",m:"m7",q:"Liquidated damages are:",a:["A penalty agreed in advance for delay or underperformance","A bonus","A tax","A loan"],why:"Often shortened to LDs.",l:2},
+ {id:"q707",m:"m7",q:"Commissioning is:",a:["Testing that everything works before handover","Buying equipment","Designing the plant","Marketing"],why:"Problems found late cost the most.",l:5},
+ {id:"q708",m:"m7",q:"An RFI is:",a:["A question sent to clarify design or requirements","A loan","A refund","A repair form"],why:"Request for Information.",l:4},
+ {id:"q709",m:"m7",q:"Which order of phases is correct?",a:["Develop, design, buy, build, test, run","Run, buy, test, design","Buy, run, develop, test","Test, build, design, run"],why:"Then COD is the day it starts selling power.",l:0},
+ {id:"q801",m:"m8",q:"A risk is:",a:["Something that might happen and hurt cost, schedule, safety, or quality","Something that already happened","A finished task","A contract"],why:"If it already happened, it is an issue.",l:0},
+ {id:"q802",m:"m8",q:"An issue is:",a:["A problem that has already happened","A maybe","A budget","A schedule"],why:"Risks are maybes. Issues are now.",l:0},
+ {id:"q803",m:"m8",q:"A risk score is usually:",a:["Likelihood x impact","Cost + time","Owner x status","Panels x batteries"],why:"Each rated 1 to 5.",l:3},
+ {id:"q804",m:"m8",q:"The four standard risk responses are:",a:["Avoid, reduce, transfer, accept","Ignore, hide, blame, delay","Buy, sell, hold, rent","Design, build, test, run"],why:"Pick one and write it down.",l:3},
+ {id:"q805",m:"m8",q:"Residual risk is:",a:["Risk left after mitigation","Risk before mitigation","Total cost","The risk owner"],why:"It should be lower, not assumed zero.",l:3},
+ {id:"q806",m:"m8",q:"Imported cells are detained at the port. Best category?",a:["Supply chain and schedule risk","Roof leak","Paint","Payroll"],why:"This really happened to Qcells in 2025.",l:5},
+ {id:"q807",m:"m8",q:"A good risk entry always has:",a:["An owner and a mitigation","Only a title","A joke","No date"],why:"No owner means nobody acts.",l:2},
+ {id:"q808",m:"m8",q:"The team disagrees with your risk rating. Best first move?",a:["Ask for the evidence and compare assumptions","Give in","Ignore them","Escalate without talking first"],why:"Facts first. Write the disagreement down.",l:6},
+ {id:"q809",m:"m8",q:"Which is a leading indicator?",a:["A supplier shipment slipping before the install date","The final cost","The finished project","A lawsuit result"],why:"Leading means early warning.",l:4},
+ {id:"qd101",m:"d1",q:"Large power systems use:",a:["Three-phase AC","Single-wire DC only","Batteries only","Wireless power"],why:"Three AC waves offset in time on three wires.",l:0},
+ {id:"qd102",m:"d1",q:"Which is medium voltage?",a:["About 34.5 kV collection lines","A 9-volt battery","A 345 kV transmission line","A phone charger"],why:"Medium voltage is about 1 to 35 kV.",l:1},
+ {id:"qd103",m:"d1",q:"Why raise the voltage for long distances?",a:["Less current, so less heat loss","More current","Cheaper panels","Brighter sun"],why:"Power = voltage x current. Higher voltage means lower current for the same power.",l:3},
+ {id:"qd104",m:"d1",q:"In the 300 MW example, the plant steps 34.5 kV up to:",a:["345 kV","3.45 kV","34.5 V","1,500 V"],why:"The collector substation steps up to transmission voltage.",l:2},
+ {id:"qd105",m:"d1",q:"Why can the main step-up transformer be a schedule risk?",a:["It is custom and can take a long time to deliver","It is free","It is always in stock","It is tiny"],why:"One case study cites 62 weeks. Lead times vary.",l:4},
+ {id:"qd201",m:"d2",q:"What does a relay do?",a:["Senses trouble and tells a breaker to open","Stores energy","Makes power","Cools the plant"],why:"The relay is the brain. The breaker is the switch.",l:1},
+ {id:"qd202",m:"d2",q:"A breaker differs from a fuse because it:",a:["Can be reset after tripping","Melts once","Is never used","Makes DC"],why:"A fuse must be replaced after it melts.",l:1},
+ {id:"qd203",m:"d2",q:"A fault is:",a:["An unwanted path for current, like a short circuit","A planned outage","A type of panel","A report"],why:"Faults send huge current. Protection must clear them fast.",l:2},
+ {id:"qd204",m:"d2",q:"Grounding is mainly for:",a:["Safety and a reference to earth","Charging batteries","Making AC","Cooling"],why:"Poor grounding means shock risk and equipment damage.",l:3},
+ {id:"qd205",m:"d2",q:"Lockout/tagout is used to:",a:["Keep equipment de-energized while people work","Order parts","Log alarms","Test panels"],why:"It protects workers from unexpected energy.",l:4},
+ {id:"qd206",m:"d2",q:"A protection problem found late, at commissioning, is usually:",a:["Costly, because fixes come at the end","Free","Impossible","Good news"],why:"Ask for test reports early as evidence.",l:5},
+ {id:"qd301",m:"d3",q:"A one-line diagram shows:",a:["The electrical system as a simple map","The paint colors","The staff schedule","The weather"],why:"One line stands for a whole three-phase connection.",l:0},
+ {id:"qd302",m:"d3",q:"A bus on a one-line diagram is:",a:["A thick bar where circuits join","A vehicle","A battery","A sensor"],why:"Feeders leave the bus to equipment.",l:1},
+ {id:"qd303",m:"d3",q:"The plant's responsibility usually ends near:",a:["The point of interconnection","The panels","The fence","The control room"],why:"Check the interconnection agreement for the exact line.",l:3},
+ {id:"qd304",m:"d3",q:"As-built drawings show:",a:["What was actually built","The first idea","The budget","The warranty"],why:"Drawings go stale. As-builts record the real thing.",l:4},
+ {id:"qd401",m:"d4",q:"North American grid frequency is:",a:["60 Hz","50 Hz","6 Hz","600 Hz"],why:"Small deviations can trigger protection and outages.",l:0},
+ {id:"qd402",m:"d4",q:"Grid inertia comes mainly from:",a:["Spinning generators","Solar panels","Batteries alone","Inverters alone"],why:"Spinning mass resists frequency change.",l:1},
+ {id:"qd403",m:"d4",q:"Solar and batteries connect to the grid through:",a:["Inverters (power electronics)","Spinning turbines","Steam","Gears"],why:"That is why they are called inverter-based resources.",l:2},
+ {id:"qd404",m:"d4",q:"A grid-forming inverter can:",a:["Help set the grid signal and limit frequency swings","Only follow the grid","Make no power","Replace the grid"],why:"Grid-following inverters sync to a signal that already exists.",l:3},
+ {id:"qd405",m:"d4",q:"Ride-through means a plant:",a:["Stays online through certain voltage or frequency dips","Shuts off at any dip","Runs only at night","Skips testing"],why:"Inverter settings that trip too easily caused solar losses in disturbances.",l:4},
+ {id:"qd406",m:"d4",q:"Reactive power helps with:",a:["Voltage support","Panel cleaning","Billing","Tracking"],why:"The required range is set by the grid operator.",l:5},
+ {id:"qe101",m:"e1",q:"In STAR, what does the R stand for?",a:["Result","Risk","Review","Rating"],why:"Situation, Task, Action, Result.",l:0},
+ {id:"qe102",m:"e1",q:"A good STAR story ends with:",a:["A clear result, ideally with a number","A joke","An apology","A question"],why:"The result is what the listener remembers.",l:0},
+ {id:"qe103",m:"e1",q:"If you do not know a term, a good move is to:",a:["Say what you know, connect it to something you have used, and ask","Guess confidently","Change the subject","Stay silent"],why:"Honesty plus curiosity beats a bluff.",l:2},
+ {id:"qe104",m:"e1",q:"The best examples to use in an interview are:",a:["Your own real experiences","Invented solar projects","Someone else's story","Copied answers"],why:"Real examples hold up under follow-up questions.",l:3}
+],
+glossary:[
+ {k:"Grid",full:"The grid",plain:"The shared network of power lines that moves electricity.",m:"m0"},
+ {k:"Utility",full:"Utility",plain:"A company that delivers electricity and runs part of the grid.",m:"m0"},
+ {k:"Load",full:"Load",plain:"Anything that uses electricity, such as homes and businesses.",m:"m0"},
+ {k:"Developer",full:"Developer",plain:"The company that finds the site and gets permits and grid permission.",m:"m0"},
+ {k:"Operator",full:"Operator",plain:"The team that runs and repairs a plant after it is built.",m:"m0"},
+ {k:"EPC",full:"Engineering, Procurement, Construction",plain:"Design it, buy the equipment, build it.",m:"m1",q:1,top:1,grp:"project"},
+ {k:"Vertical integration",full:"Vertical integration",plain:"One company makes every step itself, here from ingot to finished panel.",m:"m1"},
+ {k:"Ingot",full:"Ingot",plain:"A block of purified silicon, the first step in making cells.",m:"m1"},
+ {k:"Wafer",full:"Wafer",plain:"A thin slice cut from an ingot. It becomes a solar cell.",m:"m1"},
+ {k:"UFLPA",full:"Uyghur Forced Labor Prevention Act",plain:"US law that lets customs detain goods tied to forced labor in Xinjiang, China.",m:"m1",q:1,grp:"risk"},
+ {k:"CBP",full:"Customs and Border Protection",plain:"US agency that checks imports at the border.",m:"m1",q:1,grp:"risk"},
+ {k:"Furlough",full:"Furlough",plain:"A temporary leave from work. Workers are sent home, not fired.",m:"m1"},
+ {k:"MW",full:"Megawatt",plain:"Power: how fast energy flows. 1 MW = 1,000 kW.",m:"m2",q:1,top:1,grp:"power"},
+ {k:"MWh",full:"Megawatt-hour",plain:"Energy: how much. 100 MW for 4 hours = 400 MWh.",m:"m2",q:1,top:1,grp:"power"},
+ {k:"GW",full:"Gigawatt",plain:"1,000 MW.",m:"m2",q:1,grp:"power"},
+ {k:"DC",full:"Direct Current",plain:"Flows one way. Panels and batteries.",m:"m2",q:1,grp:"power"},
+ {k:"AC",full:"Alternating Current",plain:"Flips direction. The grid and outlets.",m:"m2",q:1,grp:"power"},
+ {k:"MWdc / MWac",full:"Megawatts DC / Megawatts AC",plain:"DC = panel rating. AC = what inverters send to the grid. Ask which one.",m:"m2"},
+ {k:"PV",full:"Photovoltaic",plain:"Turns sunlight directly into electricity.",m:"m3",q:1,top:1,grp:"solar"},
+ {k:"Module (panel)",full:"Module (panel)",plain:"Many solar cells in one frame.",m:"m3"},
+ {k:"Inverter",full:"Inverter",plain:"Changes DC to AC.",m:"m3"},
+ {k:"String",full:"String",plain:"Panels wired in a row.",m:"m3"},
+ {k:"Tracker",full:"Tracker",plain:"Motor that tilts panels to follow the sun.",m:"m3"},
+ {k:"Capacity factor",full:"Capacity factor",plain:"Share of maximum output actually produced over time.",m:"m3"},
+ {k:"Racking",full:"Racking",plain:"Steel frame that holds panels.",m:"m3"},
+ {k:"Degradation",full:"Degradation",plain:"Slow yearly loss of panel or battery output.",m:"m3"},
+ {k:"Combiner box",full:"Combiner box",plain:"Joins several strings into one cable toward the inverter.",m:"m3"},
+ {k:"TOPCon",full:"Tunnel Oxide Passivated Contact",plain:"Newer n-type solar cell design. Qcells' version is Q.ANTUM NEO.",m:"m3",q:1,grp:"solar"},
+ {k:"PERC",full:"Passivated Emitter and Rear Cell",plain:"Older mainstream p-type cell design. Qcells' version is Q.ANTUM.",m:"m3",q:1,grp:"solar"},
+ {k:"BESS",full:"Battery Energy Storage System",plain:"A large battery plant that stores power for later.",m:"m4",q:1,top:1,grp:"bess"},
+ {k:"BMS",full:"Battery Management System",plain:"Watches every battery cell for voltage, temperature, and safety.",warn:"In facilities, BMS means Building Management System.",m:"m4",q:1,top:1,two:1,grp:"bess"},
+ {k:"PCS",full:"Power Conversion System",plain:"Converts DC to AC and AC to DC for the battery.",warn:"Other industries use PCS for other things, such as process control system.",m:"m4",q:1,top:1,two:1,grp:"bess"},
+ {k:"EMS",full:"Energy Management System",plain:"Software that decides when the battery charges and discharges.",warn:"Also means Emergency Medical Services.",m:"m4",q:1,top:1,two:1,grp:"bess"},
+ {k:"LFP",full:"Lithium Iron Phosphate",plain:"A common battery chemistry for grid storage.",m:"m4",q:1,grp:"bess"},
+ {k:"SOC",full:"State of Charge",plain:"The battery fuel gauge, in percent.",warn:"Also means Security Operations Center.",m:"m4",q:1,two:1,grp:"bess"},
+ {k:"SOH",full:"State of Health",plain:"How much capacity the battery has left compared with new.",m:"m4",q:1,grp:"bess"},
+ {k:"HVAC",full:"Heating, Ventilation, Air Conditioning",plain:"Keeps batteries and equipment in a safe temperature range.",m:"m4",q:1,grp:"bess"},
+ {k:"Thermal runaway",full:"Thermal runaway",plain:"A battery cell overheats and the heat spreads cell to cell.",m:"m4"},
+ {k:"Transformer",full:"Transformer",plain:"Raises or lowers voltage.",m:"m4"},
+ {k:"Switchgear",full:"Switchgear",plain:"Breakers and protection equipment in one lineup.",m:"m4"},
+ {k:"UL 9540 / 9540A",full:"UL 9540 / UL 9540A",plain:"Storage system standard and the fire-spread test. Verify before quoting.",m:"m4"},
+ {k:"NFPA 855",full:"NFPA 855",plain:"Rules for installing stationary energy storage. Verify before quoting.",m:"m4"},
+ {k:"SCADA",full:"Supervisory Control and Data Acquisition",plain:"Screens and controls to watch and run equipment from afar.",m:"m5",q:1,top:1,grp:"scada"},
+ {k:"HMI",full:"Human-Machine Interface",plain:"The screen an operator uses.",m:"m5",q:1,grp:"scada"},
+ {k:"PLC",full:"Programmable Logic Controller",plain:"A rugged small computer that runs equipment logic.",m:"m5",q:1,grp:"scada"},
+ {k:"RTU",full:"Remote Terminal Unit",plain:"A field box that collects readings and passes commands to SCADA.",m:"m5",q:1,grp:"scada"},
+ {k:"PPC",full:"Power Plant Controller",plain:"Makes the whole plant follow grid rules.",m:"m5",q:1,grp:"scada"},
+ {k:"Historian",full:"Historian",plain:"Database of plant readings over time.",m:"m5"},
+ {k:"Tag",full:"Tag",plain:"One named data point in SCADA.",m:"m5"},
+ {k:"Setpoint",full:"Setpoint",plain:"A target value sent to equipment.",m:"m5"},
+ {k:"Curtailment",full:"Curtailment",plain:"The grid asks the plant to cut output.",m:"m5"},
+ {k:"Modbus / DNP3",full:"Modbus / DNP3",plain:"Common languages devices use to talk to SCADA. Verify details before quoting.",m:"m5"},
+ {k:"IT",full:"Information Technology",plain:"Business computers, data, email, networks. Protects data first.",m:"m6",q:1,top:1,grp:"itot"},
+ {k:"OT",full:"Operational Technology",plain:"Systems that run physical equipment. Safety and uptime come first.",warn:"Not the same as OTA.",m:"m6",q:1,top:1,two:1,grp:"itot"},
+ {k:"OTA",full:"Over-the-Air (update)",plain:"Software or firmware sent to a device remotely.",warn:"Not the same as OT.",m:"m6",q:1,top:1,two:1,grp:"itot"},
+ {k:"DMZ",full:"Demilitarized Zone",plain:"A buffer network between IT and OT with tightly controlled traffic.",m:"m6",q:1,grp:"itot"},
+ {k:"Segmentation",full:"Segmentation",plain:"Splitting networks so a problem in one does not spread to others.",m:"m6"},
+ {k:"NERC",full:"North American Electric Reliability Corporation",plain:"Sets reliability rules for the North American grid, including cyber rules (CIP).",m:"m6",q:1,grp:"grid"},
+ {k:"POI",full:"Point of Interconnection",plain:"The exact spot where the plant connects to the grid.",m:"m7",q:1,top:1,grp:"grid"},
+ {k:"COD",full:"Commercial Operation Date",plain:"The day the plant officially starts selling power.",m:"m7",q:1,top:1,grp:"project"},
+ {k:"NTP",full:"Notice to Proceed",plain:"Written go-ahead to start work.",m:"m7",q:1,grp:"project"},
+ {k:"LNTP",full:"Limited Notice to Proceed",plain:"Go-ahead for limited early work before the full contract is final.",m:"m7",q:1,grp:"project"},
+ {k:"PPA",full:"Power Purchase Agreement",plain:"A contract where a buyer agrees to buy the power on set terms.",m:"m7",q:1,grp:"project"},
+ {k:"RFI",full:"Request for Information",plain:"A question sent to clarify design or requirements.",m:"m7",q:1,grp:"project"},
+ {k:"RFQ",full:"Request for Quote",plain:"Asking suppliers for a price.",m:"m7",q:1,grp:"project"},
+ {k:"EAC",full:"Estimate at Completion",plain:"Forecast of the final total cost.",m:"m7",q:1,grp:"project"},
+ {k:"ETC",full:"Estimate to Complete",plain:"Forecast of cost still to spend.",m:"m7",q:1,grp:"project"},
+ {k:"LDs",full:"Liquidated Damages",plain:"A penalty agreed in advance for delay or underperformance.",m:"m7",q:1,grp:"project"},
+ {k:"O&M",full:"Operations and Maintenance",plain:"Running and fixing the plant after it is built.",m:"m7",q:1,grp:"project"},
+ {k:"ERCOT",full:"Electric Reliability Council of Texas",plain:"Runs most of the Texas grid.",m:"m7",q:1,grp:"grid"},
+ {k:"CAISO",full:"California Independent System Operator",plain:"Runs most of California's grid.",m:"m7",q:1,grp:"grid"},
+ {k:"Interconnection",full:"Interconnection",plain:"Permission and physical connection to the grid.",m:"m7"},
+ {k:"Commissioning",full:"Commissioning",plain:"Testing everything works before handover.",m:"m7"},
+ {k:"Contingency",full:"Contingency",plain:"Money or time set aside for expected unknowns.",m:"m7"},
+ {k:"Change order",full:"Change order",plain:"Formal change to scope, price, or schedule.",m:"m7"},
+ {k:"Critical path",full:"Critical path",plain:"The chain of tasks that sets the finish date.",m:"m7"},
+ {k:"Punch list",full:"Punch list",plain:"Small leftover items before final completion.",m:"m7"},
+ {k:"Risk register",full:"Risk register",plain:"The list of risks with owner, score, and action.",m:"m8"},
+ {k:"Likelihood",full:"Likelihood",plain:"How probable the risk is, scored 1 to 5.",m:"m8"},
+ {k:"Impact",full:"Impact",plain:"How bad it would be if it happens, scored 1 to 5.",m:"m8"},
+ {k:"Mitigation",full:"Mitigation",plain:"The action that lowers a risk.",m:"m8"},
+ {k:"Residual risk",full:"Residual risk",plain:"Risk left after the action.",m:"m8"},
+ {k:"Leading indicator",full:"Leading indicator",plain:"An early warning sign, before the damage.",m:"m8"},
+ {k:"Lagging indicator",full:"Lagging indicator",plain:"A result you see after the fact.",m:"m8"},
+ {k:"Escalation",full:"Escalation",plain:"Raising a risk to a higher decision-maker.",m:"m8"},
+ {k:"Three-phase",full:"Three-phase power",plain:"Three AC waves offset in time on three wires. Used for grid-scale power.",m:"d1"},
+ {k:"kV",full:"Kilovolt",plain:"1,000 volts.",m:"d1"},
+ {k:"Medium voltage",full:"Medium voltage",plain:"About 1 to 35 kV. Plant collection lines, often 34.5 kV.",m:"d1"},
+ {k:"High voltage",full:"High voltage",plain:"Above medium voltage, such as 115 to 345 kV. Transmission lines.",m:"d1"},
+ {k:"Collector substation",full:"Collector substation",plain:"Gathers the plant's power and steps it up for the grid.",m:"d1"},
+ {k:"Fault",full:"Fault",plain:"An unwanted path for current, such as a short circuit.",m:"d2"},
+ {k:"Breaker",full:"Circuit breaker",plain:"A resettable switch that can open under fault current.",m:"d2"},
+ {k:"Relay",full:"Protective relay",plain:"Senses trouble and tells a breaker to open.",m:"d2"},
+ {k:"Fuse",full:"Fuse",plain:"A part that melts once to stop dangerous current.",m:"d2"},
+ {k:"Grounding",full:"Grounding",plain:"Connecting equipment to the earth for safety and a reference.",m:"d2"},
+ {k:"Arc flash",full:"Arc flash",plain:"A violent burst of energy from an electrical fault.",m:"d2"},
+ {k:"Lockout/tagout",full:"Lockout/tagout",plain:"Keeping equipment de-energized while people work on it.",m:"d2"},
+ {k:"One-line diagram",full:"One-line (single-line) diagram",plain:"The electrical map of a plant, one line per connection.",m:"d3"},
+ {k:"Bus",full:"Bus",plain:"A thick bar where circuits join.",m:"d3"},
+ {k:"Feeder",full:"Feeder",plain:"A line that leaves the bus to equipment.",m:"d3"},
+ {k:"As-built",full:"As-built drawing",plain:"A drawing of what was actually built.",m:"d3"},
+ {k:"Frequency",full:"Frequency",plain:"How fast AC flips, 60 times a second in North America (60 Hz).",m:"d4"},
+ {k:"Inertia",full:"Grid inertia",plain:"Motion energy in spinning generators that resists frequency change.",m:"d4"},
+ {k:"IBR",full:"Inverter-Based Resource",plain:"Solar, wind, or batteries that connect through inverters.",m:"d4",q:1,grp:"gridtech"},
+ {k:"Grid-following",full:"Grid-following inverter",plain:"An inverter that syncs to the grid signal that already exists.",m:"d4"},
+ {k:"Grid-forming",full:"Grid-forming inverter",plain:"An inverter that can help create the grid signal and steady frequency.",m:"d4"},
+ {k:"Reactive power",full:"Reactive power",plain:"Power that helps support voltage rather than doing work.",m:"d4"},
+ {k:"Ride-through",full:"Ride-through",plain:"A plant stays online through certain voltage or frequency dips.",m:"d4"},
+ {k:"STAR",full:"Situation, Task, Action, Result",plain:"A four-part way to tell an interview story.",m:"e1",q:1,grp:"interview"},
+ {k:"Behavioral question",full:"Behavioral question",plain:"An interview question that asks for a real past example.",m:"e1"},
+ {k:"Follow-up question",full:"Follow-up question",plain:"A deeper question that tests whether your example is real.",m:"e1"}
+],
+owl:{qa:[
+ {k:["qcells","who are they","company"],a:"Qcells makes solar panels and also designs and builds solar and battery plants. Its US business for this work is based in Houston. Lesson 2 has the details."},
+ {k:["risk lead","the job","role","position"],a:"A Risk Lead finds what could go wrong on big projects, rates it, gives each risk one owner, and checks the fix is really working. You do not need to be a solar engineer."},
+ {k:["posting","job description"],a:"The job posting text has not been checked against this course yet. Save the posting and compare it. Anything you add yourself should be tagged as unverified."},
+ {k:["customs","detention","uflpa","furlough"],a:"In 2025 US Customs held up imported solar cells under a forced-labor law (UFLPA). Qcells furloughed 1,000 Georgia workers in Nov 2025. Normal production returned in March 2026. Lesson 2 covers it."},
+ {k:["atlas"],a:"Atlas V and VI are two Arizona solar plants, about 372 MWdc together. Qcells developed them, sold them, then did the EPC work and supplied panels and racking."},
+ {k:["georgia","factory","factories","cartersville","dalton"],a:"Qcells has two Georgia factories: Dalton and Cartersville. Cartersville is built to make ingot, wafer, cell, and module in one place. Company target: about 8.6 GW of panels a year by the end of Q3 2026."}
+]},
+cheat:{
+ oneliners:[
+  ["What is Qcells?","A solar maker that also designs and builds solar and battery plants, with its US business based in Houston."],
+  ["What is a BESS?","A big battery plant: racks, a converter (PCS), a transformer, switchgear, and a connection to the grid, all watched by BMS, EMS, and SCADA."],
+  ["What is SCADA?","Screens and controllers to watch and control equipment remotely. Same architecture as building automation, different vocabulary."],
+  ["OT vs IT?","OT runs physical equipment: safety and uptime first. IT runs data: secrecy first."],
+  ["OT vs OTA?","OT is the systems. OTA is a remote software update."],
+  ["What does a Risk Lead do?","Find what could go wrong, rate it, give it one owner, and check the fix is really working."]
+ ],
+ chains:[
+  {t:"Solar plant",s:["Sun","Cell","Panel","String","Combiner","Inverter (DC to AC)","Transformer","Substation","POI","Grid"]},
+  {t:"Battery plant (BESS)",s:["Cells","Racks","PCS (DC and AC)","Transformer","Switchgear","POI","Grid"]},
+  {t:"SCADA layers",s:["Sensors and devices","PLC / RTU","Network","SCADA server","HMI and historian"]},
+  {t:"Voltage staircase",s:["Panels and inverters: low voltage","Pad-mount transformer","34.5 kV collection lines","Collector substation: 115 to 345 kV","POI and grid"]}
+ ],
+ facts:[
+  ["Houston HQ for Qcells USA. Does modules, PV and BESS development, and EPC.","Qcells job listings, checked 2026-10-04"],
+  ["Georgia: Dalton (5.1 GW modules) and Cartersville (3.3 GW ingot, wafer, cell; 3.5 GW modules). Company target 8.6 GW of modules by end of Q3 2026. One outlet says 8.4 GW.","Qcells press release, 9 Jun 2026; PV Tech"],
+  ["About $2.5 billion invested in the Cartersville campus.","pv magazine USA, Solar Power World (a $2.8 billion figure was not confirmed)"],
+  ["Atlas V and VI, Arizona: 237 + 135 = 372 MWdc. Qcells developed, sold, then did EPC and supplied modules and racking. Buyer announcement lists about 357 MWdc.","PV Tech; Chrysalis announcement, 2026"],
+  ["Customs (CBP) detained imported cells under UFLPA in 2025. 1,000 workers furloughed Nov 2025. Normal production returned Mar 2026. Qcells says no Xinjiang material.","pv magazine, Electrek, 2025-2026"],
+  ["Q.ANTUM = PERC. Q.ANTUM NEO = n-type TOPCon (Q.TRON panels). Q.HOME CORE G3 home battery: AC-coupled, LFP, OTA updates.","Qcells product pages"],
+  ["Qcells has patent disputes with competitors (for example, a Maxeon TOPCon lawsuit and earlier ITC losses). Know it exists. Do not argue the merits.","Korea Times, Renewables Now, pv magazine"],
+  ["Typical plant voltages: 34.5 kV collection, stepped up to 115 to 345 kV for transmission. Varies by project.","Cordelio Flat Creek filing; SurgePV"],
+  ["Grid runs at 60 Hz. Inverter-based resources provide no inertia on their own. Grid-forming inverters are being specified.","NERC; NREL; ERCOT filing"],
+  ["NOT yet checked: the actual Risk Lead posting text. Save it and compare.","-"]
+ ],
+ ask:[
+  "What are the top three risks on your current projects?",
+  "Where does the Risk Lead sit: with the project teams, or in the Risk Management Office?",
+  "How are risks tracked today: which tool, and how often reviewed?",
+  "How do supply-chain risks, like customs holds, feed into project plans?",
+  "How are BESS safety and SCADA or cyber risks reviewed before commissioning?",
+  "What does success look like in the first 90 days?"
+ ],
+ dontknow:[
+  "I have not used that term directly. The closest thing I know is ___. How do you use it here?",
+  "Let me say it back to make sure I have it right: ...",
+  "I would verify that before giving you a number."
+ ]
+}
+};
+
+
+/* =================== ENGINE (course independent) =================== */
+var params=new URLSearchParams(location.search),custom=null;
+try{if(params.get('c')==='custom')custom=JSON.parse(localStorage.getItem('owlchi.custom')||'null')}catch(e){}
+function validCourse(c){return c&&c.id&&Array.isArray(c.modules)&&c.lessons&&Array.isArray(c.questions)&&Array.isArray(c.glossary)}
+var urlCourse=params.get('course');
+if(custom&&validCourse(custom))boot(custom);
+else if(urlCourse&&/^[\w.\-]+\.json$/.test(urlCourse))fetch(urlCourse).then(function(r){return r.json()}).then(function(c){boot(validCourse(c)?c:BUILTIN)}).catch(function(){boot(BUILTIN)});
+else boot(BUILTIN);
+
+function boot(COURSE){
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var shuffle=function(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a};
+var today=function(){return new Date().toLocaleDateString('en-CA')};
+var LASTP={};
+function pickNR(key,arr){if(!arr.length)return '';var i,n=0;do{i=Math.floor(Math.random()*arr.length);n++}while(i===LASTP[key]&&arr.length>1&&n<8);LASTP[key]=i;return arr[i]}
+
+/* ---------- course shape ---------- */
+var CERT_TITLE=COURSE.certTitle||COURSE.title;
+var MODS={};COURSE.modules.forEach(function(m){MODS[m.id]=m});
+var CORE=COURSE.modules.filter(function(m){return m.kind!=='explore'});
+var EXPL=COURSE.modules.filter(function(m){return m.kind==='explore'});
+var GL=COURSE.glossary,GMAP={};GL.forEach(function(g){GMAP[g.k]=g});
+var TAUGHT={};COURSE.modules.forEach(function(m){(m.terms||[]).forEach(function(k){TAUGHT[k]=m.id})});
+var CHEAT=COURSE.cheat||{oneliners:[],chains:[],facts:[],ask:[],dontknow:[]};
+
+/* ---------- state ---------- */
+var KEY='owlchi.v2.'+COURSE.id;
+function defState(){return {cards:{},terms:{},xp:0,pts:{lesson:0,quiz:0,terms:0,bonus:0},mp:{},daily:{},log:[],days:[],done:{},qdone:{},read:{},final:{best:0,passed:false,date:'',tries:0},name:'',certSeen:false,introHide:false,bonusDay:'',set:{music:false,sfx:false,vol:0.5,motion:true,owl:true,size:0},notes:{about:'',s1:'',s2:'',s3:''}}}
+function load(){var d=defState();try{var r=JSON.parse(localStorage.getItem(KEY)||'{}');for(var k in r){if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k])&&['set','notes','pts','final'].indexOf(k)>=0){for(var j in r[k])d[k][j]=r[k][j]}else d[k]=r[k]}}catch(e){}return d}
+var S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var LV=120,TITLES=['Hatchling','Fledgling','Watcher','Night Owl','Sky Owl','Risk Owl','Grid Owl','Master Owl'];
+function level(){return Math.floor(S.xp/LV)+1}
+function ltitle(){return TITLES[Math.min(level()-1,TITLES.length-1)]}
+
+/* ---------- points ---------- */
+function popup(t){var p=document.createElement('span');p.className='pp';p.textContent=t;$('#pop').appendChild(p);setTimeout(function(){if(p.parentNode)p.parentNode.removeChild(p)},1900)}
+function hud(){$('#score').textContent=S.xp.toLocaleString();$('#lvname').textContent='Level '+level()+' '+ltitle();var n=Math.floor((S.xp%LV)/LV*10),b='';for(var i=0;i<10;i++)b+='<i'+(i<n?' class="on"':'')+'></i>';$('#lvblocks').innerHTML=b;$('#today').textContent='+'+(S.daily[today()]||0);var on=S.set.music||S.set.sfx;var sb=$('#soundbtn');sb.textContent='Sound: '+(on?'on':'off');sb.setAttribute('aria-pressed',on?'true':'false')}
+var react='';
+function award(n,label,cat,m){if(!n)return;var before=level();S.xp+=n;S.pts[cat]=(S.pts[cat]||0)+n;if(m&&MODS[m])S.mp[m]=(S.mp[m]||0)+n;var t=today();S.daily[t]=(S.daily[t]||0)+n;S.log.unshift([label,n,t]);S.log=S.log.slice(0,30);save();hud();popup('+'+n+' '+label);
+  if(level()>before){tone([[523,.1],[659,.1],[784,.1],[1047,.2]]);popup('Level up: '+ltitle());react='Level up! You are now '+ltitle()+'.';owlAct('cheer')}}
+function dailyBonus(){if(S.bonusDay!==today()){S.bonusDay=today();award(10,'Daily start bonus','bonus')}}
+
+/* ---------- questions ---------- */
+var QS=(COURSE.questions||[]).slice();
+GL.forEach(function(g){
+  if(g.q)QS.push({id:'g-'+g.k,m:g.m,gen:1,type:'abbr',g:g,q:'What does '+g.k+' stand for?',why:g.k+' = '+g.full+'. '+g.plain+(g.warn?' Careful: '+g.warn:'')});
+  if(TAUGHT[g.k]&&g.plain.length<130&&g.plain.toLowerCase().indexOf(g.k.toLowerCase())<0)QS.push({id:'t-'+g.k,m:TAUGHT[g.k],gen:1,type:'term',g:g,q:'Which term means: "'+g.plain+'"',why:g.k+': '+g.plain+(g.warn?' Careful: '+g.warn:'')});
+});
+var QMAP={};QS.forEach(function(q){QMAP[q.id]=q});
+function optionsFor(q){
+  if(q.gen&&q.type==='abbr'){var pool=GL.filter(function(x){return x.q&&x.k!==q.g.k&&x.full!==q.g.full});var key=function(x){return x.grp||x.m};var same=shuffle(pool.filter(function(x){return key(x)===key(q.g)})),rest=shuffle(pool.filter(function(x){return key(x)!==key(q.g)}));var seen={},d=[];same.concat(rest).forEach(function(x){if(d.length<3&&!seen[x.full]){seen[x.full]=1;d.push(x.full)}});return {opts:shuffle([q.g.full].concat(d)),correct:q.g.full}}
+  if(q.gen&&q.type==='term'){var mod=MODS[q.m],p=shuffle((mod.terms||[]).filter(function(k){return k!==q.g.k})).slice(0,3);if(p.length<3){var ex=shuffle(Object.keys(TAUGHT).filter(function(k){return k!==q.g.k&&p.indexOf(k)<0}));p=p.concat(ex.slice(0,3-p.length))}return {opts:shuffle([q.g.k].concat(p)),correct:q.g.k}}
+  return {opts:shuffle(q.a),correct:q.a[0]}}
+function hintFor(q){if(q.gen)return q.type==='abbr'?'Clue: '+q.g.plain:'Clue: it starts with "'+q.g.k.charAt(0)+'" and is taught in "'+MODS[q.m].title+'".';var c=(COURSE.lessons[q.m]||[])[q.l];if(!c)return 'Look back at the lesson for "'+MODS[q.m].title+'".';return 'From the lesson "'+c.t+'": '+(c.b||c.chain||[]).join(' ')}
+function status(id){var c=S.cards[id];if(!c)return 'new';if(c.miss>=2&&c.box<=1)return 'revisit';if(c.box>=3)return 'know';return 'review'}
+function tstatus(k){var c=S.terms[k];if(!c||!c.seen)return 'new';if(c.miss>=2&&c.box<=1)return 'revisit';if(c.box>=3)return 'know';return 'review'}
+function modQs(m){return QS.filter(function(q){return q.m===m})}
+function mastery(m){var a=modQs(m),k=a.filter(function(q){return status(q.id)==='know'}).length;return {know:k,total:a.length,pct:a.length?Math.round(100*k/a.length):0}}
+function counts(){var c={know:0,review:0,revisit:0,'new':0};QS.forEach(function(q){c[status(q.id)]++});return c}
+function record(id,ok){var c=S.cards[id]||(S.cards[id]={box:0,miss:0,seen:0});c.seen++;if(ok){c.box=Math.min(4,c.box+1);if(c.box>=3)c.miss=0}else{c.box=0;c.miss++}var t=today();if(S.days.indexOf(t)<0)S.days.push(t);save()}
+function termKeys(m){return ((MODS[m]&&MODS[m].terms)||[]).filter(function(k){return GMAP[k]})}
+
+/* ---------- owl dialogue (course independent) ---------- */
+var D={
+greet:["Hi. I am Owlchi. I will walk you through this, one small step at a time.","Welcome back. Tap Continue and we pick up where you left off.","Good to see you. No rush. One card at a time.","Hello. Short sessions beat long ones. Start small.","Ready when you are. I am right here if you get stuck.","Hi again. Ask me anything. I know every term in this course.","Welcome. You do not need any background. I will explain things in plain words.","Hello. Slow is fine. Remembering takes repetition, not speed."],
+right:["Yes. That one is yours.","Correct. Nice recall.","Right. Keep going.","Exactly right.","That is it. Your memory is working.","Good one.","Yes. You pulled that out of your head.","Correct. That is how it sticks.","Spot on.","Nice. One more brick in the wall.","Right again.","Well done.","That is correct. Steady progress.","Yes, you have this."],
+wrong:["Not this time. That is how it sticks.","Close the gap: read the why below.","It will come back around. Read the why.","Missing one is part of learning. Read the why.","No problem. Now you have seen the answer.","Not quite. I will bring it back later.","That one is tricky. The why will help.","A miss now means a win later.","Okay. Look at the right answer once, then move on.","It is fine. We retry the ones you miss."],
+streak:["Three in a row. Your focus is good.","Five in a row. Strong run.","Nice streak. Keep it easy.","You are on a roll. Breathe and keep going."],
+lesson:["Read it once. The quiz does the remembering.","One card, one idea.","Take your time. Tap Next when ready.","Short cards. Big picture.","If a word is new, that is normal. We cover terms at the end.","Ask me if anything is unclear."],
+tips:["Short sessions of 5 to 10 minutes work better than one long one.","Say the answer out loud before you pick. It helps memory.","Sleep helps memory more than extra studying.","Look at what you missed, not just what you got right.","Connect each new word to something you already know.","Write one thing you learned in your own words.","Take a break when you feel tired. Come back later.","Spacing matters: the quiz brings things back at the right time.","If a term has two meanings, picture each one separately.","Explain a term to someone else. Teaching locks it in.","Do the quiz right after the lesson, then again tomorrow.","Do not memorize everything. Aim to know the big picture and the key terms.","Water and a stretch help focus.","Mistakes are data. They show what to review."],
+nudge:["Still there? I can explain this card simply. Tap Ask Owlchi.","Need a hand? Ask me to explain, or tap Hint.","Take your time. When you are ready, tap the next button.","Stuck? Tap Ask Owlchi, then I am stuck.","Want a tip? Tap Tip.","I am here if you want help."],
+milestone:["First lesson done. Great start.","Half the core path done. Well done.","Core path complete. Time for the Final Check.","You passed the Final Check. Your certificate is ready.","New level. Nice work.","Ten days of practice. Impressive."],
+jokes:["Why did the owl study risk? It was a real night shift worrier.","What do owls say about batteries? Whooo stores the energy?","I told the transformer a joke. It was a step up.","My favorite solar fact: it is always bright side up.","An inverter walks into a bar and changes the current mood.","Why was the engineer calm? Everything was grounded.","Owl be honest: SCADA sounds scarier than it is.","Hoot hoot. That is owl talk for good job."],
+done:["Good session. Rest your brain.","That is enough for now, or go again.","Nice work. You can stop any time. Progress is saved."],
+levelup:["Level up. Hoot hoot.","You leveled up. Keep it calm.","New level reached."]
+};
+var DQA=[
+ {k:["how do i play","how does this work","what do i do","how to use","instructions","help"],a:"Tap Continue on the Learn page. Each topic has a lesson, a few key terms, and a short quiz. Points show at the top. You can stop any time. Progress saves."},
+ {k:["points","score","xp","how are points"],a:"Reading a lesson card +2. Flipping a key term +4 if you knew it, +1 if not. Finishing a lesson +20. A right answer +10 (+7 with a hint, +5 on a retry). Finishing a quiz +10, and +15 more if perfect. Matching a pair +3. Mastering a term +5. Daily start +10. Passing the Final Check +50."},
+ {k:["level","levels","title"],a:"Every 120 points is a new level. Titles go from Hatchling up to Master Owl."},
+ {k:["hint","clue"],a:"During a quiz, tap Hint. It shows the lesson card that covers the answer. A right answer with a hint is worth +7 instead of +10."},
+ {k:["music","sound","mute","volume","audio"],a:"Tap the Sound button at the top to turn music and effects on or off. Settings under Progress lets you set them separately and change the volume."},
+ {k:["certificate","certify","completion"],a:"Finish all the core lessons and pass the Final Check (80% or higher). Then you can type your name and print or save your certificate. It is a self-study completion certificate, not an accredited credential."},
+ {k:["final check","exam","test"],a:"The Final Check is 20 mixed questions from the core topics. No hints. You need 80% to pass. It unlocks after you finish the core lessons."},
+ {k:["stuck","lost","confused","dont understand","don't understand","help me"],a:"That is okay. Take one card at a time. Ask me to explain this simply, or open the Terms tab and flip the key terms. You can also ask me about any word."},
+ {k:["next","what now","what should i do"],a:"Tap Continue on the Learn page. It always shows your next step."},
+ {k:["background","experience","beginner","new to","never"],a:"No background is needed. The first lesson gives the big picture in plain words. Each new word gets explained, and I am here for anything else."},
+ {k:["official","affiliated","endorse","accredited"],a:"This is a self-study tool. It is not affiliated with or endorsed by any company named in it, and the certificate is not an accredited credential."},
+ {k:["facts","accurate","verified","sources","trust"],a:"Lesson cards tagged Checked were verified against public sources on 2026-10-04. Cards tagged General knowledge are standard industry ideas. Always confirm before quoting anything in an interview."},
+ {k:["reset","erase","delete","start over"],a:"Go to Progress, then Your data, then Reset everything. You can export a copy first."},
+ {k:["save","saved","lose progress","device"],a:"Progress saves on this device in this browser. Use Progress, then Export progress to keep a backup or move it."},
+ {k:["how long","time","minutes"],a:"Each lesson takes about 3 to 5 minutes. A quiz is 8 questions. The whole core path is a few hours spread over several days."},
+ {k:["remember","memorize","memory","study tip","learn faster"],a:"Short sessions, saying answers out loud, and coming back the next day work best. The quiz brings back what you miss. Ask me for a tip any time."},
+ {k:["terms","glossary","words","definitions"],a:"The Terms tab has every word. Flip cards and the Match game are there too. Key terms also appear at the end of each lesson."},
+ {k:["own course","make a course","new course","other role","another topic","clone"],a:"Go to Progress, then About and your own course. Copy the prompt, give it to an AI assistant with your document, then load the file it makes."},
+ {k:["who are you","owlchi","your name"],a:"I am Owlchi, your study helper. I live in this page and answer from the course material. I do not use the internet."},
+ {k:["joke","funny"],a:"__joke__"},
+ {k:["tip","advice"],a:"__tip__"},
+ {k:["why risk","why does this matter","why matters"],a:"Big projects fail in small ways first: a late part, a wrong setting, a missed rule. A Risk Lead spots those early and makes sure someone owns the fix."},
+ {k:["quiz me","test me","practice"],a:"__quiz__"}
+];
+var QA=DQA.concat((COURSE.owl&&COURSE.owl.qa)||[]);
+
+/* ---------- owl drawing ---------- */
+var BASE=["b..........b","bb........bb","bbbbbbbbbbbb","bbeeebbeeebb","bbepebbepebb","bbeeebbeeebb","bbbbboobbbbb","bbllllllllbb","bbllllllllbb","bbllllllllbb",".bbbbbbbbbb.","..oo....oo.."];
+var EY={lookL:["bbeeebbeeebb","bbpeebbpeebb","bbeeebbeeebb"],lookR:["bbeeebbeeebb","bbeepbbeepbb","bbeeebbeeebb"],blink:["bbbbbbbbbbbb","bbpppbbpppbb","bbbbbbbbbbbb"],happy:["bbbpbbbbpbbb","bbpbpbbpbpbb","bbbbbbbbbbbb"],oops:["bbeeebbeeebb","bbeeebbeeebb","bbpeebbpeebb"],think:["bbepebbepebb","bbeeebbeeebb","bbeeebbeeebb"]};
+var FR={idle:{},lookL:{e:'lookL'},lookR:{e:'lookR'},blink:{e:'blink'},happy:{e:'happy'},oops:{e:'oops'},think:{e:'think'},
+ sleep:{e:'blink',x:[[12,0],[13,1]],c:'o'},wave1:{e:'happy',x:[[13,3],[13,4],[13,5]]},wave2:{e:'happy',x:[[13,4],[13,5],[13,6]]},cheer:{e:'happy',x:[[0,2],[0,3],[0,4],[13,2],[13,3],[13,4]]}};
+var FILL={b:'var(--owl-b)',l:'var(--owl-l)',e:'#fff',p:'#111',o:'var(--owl-o)'};
+function owlSVG(f){var fr=FR[f]||{},rows=BASE.slice();if(fr.e){var e=EY[fr.e];rows[3]=e[0];rows[4]=e[1];rows[5]=e[2]}var r='';rows.forEach(function(row,y){for(var x=0;x<12;x++){var ch=row.charAt(x);if(ch!=='.')r+='<rect x="'+(x+1)+'" y="'+y+'" width="1" height="1" style="fill:'+FILL[ch]+'"/>'}});(fr.x||[]).forEach(function(p){r+='<rect x="'+p[0]+'" y="'+p[1]+'" width="1" height="1" style="fill:'+(fr.c?FILL[fr.c]:FILL.b)+'"/>'});return '<svg viewBox="0 0 14 12" aria-hidden="true">'+r+'</svg>'}
+var owlF='idle',owlT=[],hold=false,lastAct=Date.now(),nudged=false,sleeping=false;
+function motionOn(){return S.set.motion&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}
+function setFrame(f,cls){owlF=f;var el=$('#owl');el.innerHTML=owlSVG(f);el.className=motionOn()?(cls||''):''}
+function clearT(){owlT.forEach(clearTimeout);owlT=[]}
+function owlAct(kind){clearT();sleeping=false;hold=true;var back=function(ms){owlT.push(setTimeout(function(){hold=false;setFrame('idle','bob')},ms))};
+  if(kind==='happy'){setFrame('happy','hop');back(2600)}
+  else if(kind==='oops'){setFrame('oops','tilt');back(2600)}
+  else if(kind==='think'){setFrame('think','bob');back(2200)}
+  else if(kind==='cheer'){setFrame('cheer','hop');back(3200)}
+  else if(kind==='wave'){var n=0;(function w(){if(n>=6){hold=false;setFrame('idle','bob');return}setFrame(n%2?'wave2':'wave1','');n++;owlT.push(setTimeout(w,280))})()}
+  else{hold=false;setFrame('idle','bob')}}
+setInterval(function(){if(!S.set.owl||hold||!motionOn())return;
+  if(sleeping)return;
+  if(Date.now()-lastAct>90000){sleeping=true;setFrame('sleep','');return}
+  if(owlF==='idle'){var r=Math.random();if(r<.65){setFrame('blink','bob');setTimeout(function(){if(!hold&&!sleeping)setFrame('idle','bob')},170)}else{setFrame(r<.82?'lookL':'lookR','bob');setTimeout(function(){if(!hold&&!sleeping)setFrame('idle','bob')},1000)}}},4200);
+
+/* ---------- sound ---------- */
+var AC=null;
+function ctx(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}return AC}
+function tone(seq){if(!S.set.sfx)return;var c=ctx();if(!c)return;try{var t=c.currentTime;seq.forEach(function(p){var o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=p[0];g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.05*S.set.vol*2,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+p[1]);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+p[1]+0.02);t+=p[1]})}catch(e){}}
+var MU={on:false,master:null,timer:null,next:0,step:0,filt:null,del:null};
+var PROG=[{root:45,ch:[57,60,64,67]},{root:41,ch:[53,57,60,64]},{root:48,ch:[60,64,67,71]},{root:43,ch:[55,59,62,64]}];
+var PENT=[0,2,4,7,9];
+function mf(n){return 440*Math.pow(2,(n-69)/12)}
+function note(c,dest,type,f,t,dur,vol,att){var o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(dest);o.start(t);o.stop(t+dur+0.05)}
+function schedule(){var c=AC;if(!c||!MU.on)return;var eighth=60/68/2;while(MU.next<c.currentTime+0.7){var t=MU.next,bar=Math.floor(MU.step/16)%PROG.length,pos=MU.step%16,ch=PROG[bar];
+  if(pos===0){ch.ch.forEach(function(n,i){note(c,MU.filt,'triangle',mf(n),t+i*0.03,eighth*15,0.05,1.2)})}
+  if(pos===0||pos===8){note(c,MU.master,'sine',mf(ch.root),t,eighth*7,0.16,0.04)}
+  if(pos%2===0&&Math.random()<0.75){var base=ch.ch[Math.floor(Math.random()*ch.ch.length)]+12;var n=Math.random()<0.5?base:ch.root+24+PENT[Math.floor(Math.random()*5)];note(c,MU.del,'sine',mf(n),t,eighth*3,0.05,0.01)}
+  MU.next+=eighth;MU.step++}}
+function musicStart(){var c=ctx();if(!c||MU.on)return;if(c.state==='suspended')c.resume();MU.master=c.createGain();MU.master.gain.value=0.5*S.set.vol;MU.master.connect(c.destination);MU.filt=c.createBiquadFilter();MU.filt.type='lowpass';MU.filt.frequency.value=900;MU.filt.connect(MU.master);MU.del=c.createGain();var dl=c.createDelay(1.0);dl.delayTime.value=0.38;var fb=c.createGain();fb.gain.value=0.35;MU.del.connect(MU.master);MU.del.connect(dl);dl.connect(fb);fb.connect(dl);fb.connect(MU.master);MU.on=true;MU.next=c.currentTime+0.1;MU.step=0;MU.timer=setInterval(schedule,120)}
+function musicStop(){MU.on=false;clearInterval(MU.timer);if(MU.master){try{MU.master.gain.setTargetAtTime(0,AC.currentTime,0.2);var m=MU.master;setTimeout(function(){try{m.disconnect()}catch(e){}},900)}catch(e){}}}
+function applyAudio(){if(S.set.music){if(!MU.on)musicStart()}else if(MU.on)musicStop();if(MU.master&&AC)MU.master.gain.value=0.5*S.set.vol}
+document.addEventListener('visibilitychange',function(){if(!AC)return;if(document.hidden)AC.suspend();else if(S.set.music||S.set.sfx)AC.resume()});
+var firstTap=false;
+document.addEventListener('pointerdown',function(){if(!firstTap){firstTap=true;if(S.set.music)applyAudio()}},{once:true});
+
+/* ---------- scenes (static pixel art) ---------- */
+function R(x,y,w,h,f){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="var(--'+f+')"/>'}
+var DIG={'6':['111','100','111','101','111'],'0':['111','101','101','101','111']};
+function sceneBody(k){var g=R(0,21,96,3,'p4'),s='';
+ var pylon=function(x){return R(x+2,4,2,17,'p1')+R(x,8,6,1,'p1')+R(x+1,12,4,1,'p1')+R(x,5,6,1,'p1')};
+ if(k==='m0'){s=R(6,3,6,6,'p3')+R(16,13,12,5,'p1')+R(16,15,12,1,'p2')+R(28,16,16,1,'p2')+pylon(44)+R(50,8,20,1,'p2')+R(74,13,12,8,'p1')+R(72,11,16,2,'p2')+R(78,16,3,5,'p3')}
+ else if(k==='m1'){s=R(80,3,6,6,'p3')+R(8,11,20,10,'p1')+R(8,9,4,2,'p1')+R(14,9,4,2,'p1')+R(20,9,4,2,'p1')+R(26,5,3,6,'p1')+R(27,3,2,2,'p2')+R(29,1,2,2,'p2')+R(11,14,2,2,'p3')+R(16,14,2,2,'p3')+R(21,14,2,2,'p3');for(var i=0;i<5;i++)s+=R(40+i*8,16,6,3,'p1')+R(41+i*8,16,2,1,'p3');s+=R(60,18,6,3,'p3')}
+ else if(k==='m2'||k==='d1'&&0){s=pylon(14)+pylon(62)+R(18,6,46,1,'p2')+R(18,9,46,1,'p2')+R(40,4,2,4,'p3')+R(38,7,4,2,'p3')+R(40,9,2,5,'p3')+R(84,4,2,12,'p2')}
+ else if(k==='m3'){s=R(8,3,7,7,'p3');for(var j=0;j<5;j++)s+=R(28+j*13,13,10,6,'p1')+R(28+j*13,15,10,1,'p2')+R(33+j*13,13,1,6,'p2')+R(32+j*13,19,2,2,'p4')}
+ else if(k==='m4'){for(var b=0;b<5;b++)s+=R(14+b*14,8,10,13,'p1')+R(17+b*14,6,4,2,'p1')+R(16+b*14,10+(b>3?4:0),6,9-(b>3?4:0),'p3');s+=R(86,6,2,5,'p3')+R(84,10,4,2,'p3')}
+ else if(k==='m5'){s=R(10,5,24,15,'p1')+R(12,7,20,11,'p2')+R(13,14,3,3,'p3')+R(16,12,3,5,'p3')+R(19,9,3,8,'p3')+R(22,11,3,6,'p3')+R(38,5,24,15,'p1')+R(40,7,20,11,'p2')+R(43,9,2,2,'p3')+R(48,9,2,2,'p3')+R(53,9,2,2,'p3')+R(43,14,2,2,'p3')+R(66,5,24,15,'p1')+R(68,7,20,11,'p2')+R(70,16,3,2,'p3')+R(75,13,3,5,'p3')+R(80,10,3,8,'p3')}
+ else if(k==='m6'){s=R(6,8,18,12,'p1')+R(10,10,10,3,'p2')+R(12,8,6,2,'p2')+R(72,8,18,12,'p1')+R(78,11,6,6,'p2')+R(80,10,2,8,'p2')+R(77,13,8,2,'p2')+R(24,16,48,2,'p4')+R(46,6,4,7,'p3')+R(46,16,4,4,'p3')+R(30,14,3,2,'p2')}
+ else if(k==='m7'){s=R(70,2,3,19,'p3')+R(50,2,30,2,'p3')+R(76,4,4,4,'p1')+R(54,4,1,8,'p2')+R(52,12,5,3,'p1')+R(20,17,20,4,'p1')+R(22,13,16,4,'p2')+R(24,9,12,4,'p1')+R(26,11,2,2,'p3')+R(32,11,2,2,'p3')}
+ else if(k==='m8'){s=R(10,6,14,12,'p1')+R(12,18,10,2,'p1')+R(14,20,6,1,'p1')+R(16,9,2,6,'p3')+R(16,16,2,2,'p3')+'<rect x="52" y="2" width="36" height="19" fill="none" stroke="var(--p2)" stroke-width="0.6"/><rect x="58" y="5" width="24" height="13" fill="none" stroke="var(--p2)" stroke-width="0.6"/><rect x="64" y="8" width="12" height="7" fill="none" stroke="var(--p2)" stroke-width="0.6"/>'+R(70,11,16,1,'p3')+R(78,7,2,2,'p3')+R(62,15,2,2,'p3')}
+ else if(k==='d1'){for(var x=4;x<92;x+=4){s+=R(x,10+Math.round(4*Math.sin(x/6)),3,2,'p1')+R(x,10+Math.round(4*Math.sin(x/6+2.09)),3,2,'p2')+R(x,10+Math.round(4*Math.sin(x/6+4.19)),3,2,'p3')}}
+ else if(k==='d2'){s=R(30,6,36,14,'p1')+R(36,13,6,2,'p2')+R(56,13,6,2,'p2')+R(44,9,10,2,'p3')+R(52,9,2,5,'p3')+R(76,4,2,5,'p3')+R(74,8,4,2,'p3')+R(76,10,2,5,'p3')+R(16,6,2,4,'p2')+R(12,10,10,1,'p2')+R(14,12,6,1,'p2')+R(16,14,2,1,'p2')}
+ else if(k==='d3'){s=R(10,8,6,6,'p3')+R(16,10,16,1,'p2')+R(32,8,6,6,'p1')+R(36,8,6,6,'p2')+R(42,10,10,1,'p2')+R(52,9,3,3,'p3')+R(55,10,8,1,'p2')+R(63,4,3,15,'p1')+R(66,6,20,1,'p2')+R(66,11,20,1,'p2')+R(66,16,20,1,'p2')}
+ else if(k==='d4'){for(var w=4;w<56;w+=3)s+=R(w,10+Math.round(5*Math.sin(w/4)),2,2,'p1');[['6',64],['0',76]].forEach(function(d){DIG[d[0]].forEach(function(row,ry){for(var cx=0;cx<3;cx++)if(row.charAt(cx)==='1')s+=R(d[1]+cx*3,5+ry*3,3,3,'p3')})})}
+ else if(k==='e1'){s=R(10,5,28,10,'p2')+R(14,15,4,3,'p2')+R(16,9,3,2,'p3')+R(22,9,3,2,'p3')+R(28,9,3,2,'p3')+R(48,8,34,11,'p1')+R(76,19,4,2,'p1')+R(54,12,18,1,'p2')+R(54,15,12,1,'p2')}
+ else if(k==='learn'){s=R(10,18,8,3,'p1')+R(22,15,8,6,'p1')+R(34,12,8,9,'p1')+R(46,9,8,12,'p1')+R(58,6,8,15,'p1')+R(66,2,1,5,'p2')+R(67,2,4,3,'p3')+R(78,5,1,1,'p2')+R(86,10,1,1,'p2')+R(90,4,1,1,'p2')}
+ else if(k==='practice'){s=R(30,8,8,8,'p3')+R(32,10,4,4,'p4')+R(46,8,8,8,'p3')+R(48,10,4,4,'p4')+R(62,8,8,8,'p3')+R(64,10,4,4,'p4')+R(12,5,1,1,'p2')+R(84,6,1,1,'p2')}
+ else if(k==='terms'){s=R(30,8,18,12,'p2')+R(34,6,18,12,'p1')+R(38,4,18,12,'p3')+R(42,8,10,1,'p4')+R(42,11,8,1,'p4')+R(70,6,1,1,'p2')+R(12,5,1,1,'p2')}
+ else if(k==='cheat'){s=R(40,3,16,18,'p1')+R(44,1,8,3,'p2')+R(43,8,10,1,'p2')+R(43,11,10,1,'p2')+R(43,14,7,1,'p2')+R(52,16,3,2,'p3')}
+ else if(k==='progress'){s=R(42,5,12,8,'p3')+R(40,6,2,4,'p3')+R(54,6,2,4,'p3')+R(46,13,4,4,'p3')+R(43,17,10,3,'p1')+R(14,6,1,1,'p2')+R(80,8,1,1,'p2')}
+ else if(k==='cert'||k==='final'){s=R(40,4,16,12,'p3')+R(44,8,8,4,'p1')+R(43,16,4,5,'p2')+R(49,16,4,5,'p2')+R(14,6,1,1,'p2')+R(82,7,1,1,'p2')}
+ else{s=R(10,5,1,1,'p2')+R(30,3,1,1,'p2')+R(50,6,1,1,'p2')+R(70,4,1,1,'p2')+R(18,14,16,7,'p1')+R(50,12,20,9,'p1')}
+ return g+s}
+var SCN_TH={m0:'t3',m1:'t1',m2:'t2',m3:'t3',m4:'t4',m5:'t5',m6:'t6',m7:'t7',m8:'t8',d1:'t2',d2:'t8',d3:'t5',d4:'t6',e1:'t7'};
+var SCN_FALL=['m1','m2','m3','m4','m5','m6','m7','m8'];
+function sceneKey(){var mid=null;if(view==='lesson'&&les)mid=les.m;else if(view==='session'&&sess&&sess.mod&&sess.mod!=='smart'&&sess.mod!=='final')mid=sess.mod;
+  if(mid){var m=MODS[mid];if(m&&m.scene)return m.scene;if(SCN_TH[mid])return mid;return SCN_FALL[COURSE.modules.indexOf(m)%8]}
+  if(view==='session')return sess&&sess.mod==='final'?'final':'practice';if(view==='hunt'||view==='match')return 'terms';return view==='lesson'?'learn':view}
+function scene(){var k=sceneKey();document.body.setAttribute('data-th',SCN_TH[k]||'t1');return '<div class="scene" aria-hidden="true"><svg viewBox="0 0 96 24" preserveAspectRatio="xMidYMid slice">'+sceneBody(k)+'</svg></div>'}
+
+/* ---------- path ---------- */
+var view='learn',sess=null,les=null,hunt=null,match=null,wmod='all',wfilter='all',wq='';
+function coreDone(){return CORE.every(function(m){return S.done[m.id]})}
+function steps(){var o=[];CORE.forEach(function(m){o.push({t:'lesson',m:m});o.push({t:'quiz',m:m})});o.push({t:'final'});o.push({t:'cert'});return o}
+function stepDone(s){return s.t==='lesson'?!!S.done[s.m.id]:s.t==='quiz'?!!S.qdone[s.m.id]:s.t==='final'?!!S.final.passed:!!S.certSeen}
+function nextStep(){var a=steps();for(var i=0;i<a.length;i++)if(!stepDone(a[i]))return a[i];return null}
+function stepText(s){var n=s.m?CORE.indexOf(s.m)+1:0;if(s.t==='lesson')return 'Topic '+n+' of '+CORE.length+': '+s.m.title+' (lesson and key terms, about 5 minutes)';if(s.t==='quiz')return 'Topic '+n+' of '+CORE.length+': quiz on '+s.m.title+' (8 questions)';if(s.t==='final')return 'Final Check: 20 mixed questions. 80% to pass.';return 'Get your certificate of completion.'}
+function goStep(s){if(!s)return;if(s.t==='lesson')openLesson(s.m.id);else if(s.t==='quiz')startSession(s.m.id);else if(s.t==='final')startFinal();else{view='cert';render()}}
+
+/* ---------- guide text ---------- */
+function guide(){
+ if(view==='learn'){var ns=nextStep();return ns?'Tap Continue to start at the beginning. Each topic has 3 parts: lesson, key terms, quiz.':'All steps done. Practice to keep it fresh, or explore more topics.'}
+ if(view==='lesson'){if(!les)return '';if(les.phase==='cards'){var last=les.i>=(COURSE.lessons[les.m]||[]).length-1;return last?'Last card. Tap the button to see the key terms.':'Read the card, then tap Next. You earn +2 points for each new card.'}
+   if(les.phase==='terms')return les.flip?'Be honest. Tap Got it or Not yet. Both help you learn.':'Think about what it means. Then tap Flip.';return 'Lesson complete. Take the quiz while it is fresh.'}
+ if(view==='practice')return 'Pick Smart session, or choose a topic below. Quiz questions come only from lessons you finished.';
+ if(view==='session'){if(!sess)return '';if(sess.gate)return 'Read the lesson first. It takes about five minutes.';if(sess.phase==='done')return 'Session done. Nice work.';if(sess.phase==='fb')return 'Read the why. Then tap Next.';return sess.kind==='final'?'Final Check. Pick the best answer. No hints on this one.':'Pick an answer: tap it, or press 1 to 4. Stuck? Tap Hint.'}
+ if(view==='terms')return 'Collect terms. Flip cards teach you each one. Match pairs terms with meanings.';
+ if(view==='hunt')return hunt&&hunt.flip?'Be honest. Tap Got it or Not yet.':'Say what it means. Then tap Flip.';
+ if(view==='match')return 'Tap a term, then tap its meaning.';
+ if(view==='cheat')return 'Your one-page review. Print it or keep it open.';
+ if(view==='cert')return 'Your certificate. Type your name, then print or save as PDF.';
+ return 'Your scores, settings, and data live here.'}
+function renderBubble(){var b=$('#bubble');b.textContent=(react?react+' ':'')+guide()}
+
+/* ---------- chat ---------- */
+var chat={open:false,log:[]};
+function owlSay(t,btn){chat.log.push({who:'owl',t:t,btn:btn});if(chat.log.length>40)chat.log.shift()}
+function ctxCard(){if(view==='lesson'&&les&&les.phase==='cards')return (COURSE.lessons[les.m]||[])[les.i];return null}
+function explainSimply(){var c=ctxCard();if(c){var core=(c.b&&c.b[0])||(c.chain&&c.chain.join(' then '))||'';return 'In short: '+core+(c.tip?' Remember: '+c.tip:'')}
+  if(view==='session'&&sess&&sess.cur&&!sess.gate&&sess.phase!=='done'&&sess.kind!=='final')return hintFor(sess.cur.q);
+  if(view==='hunt'&&hunt&&hunt.queue[hunt.i]){var g=GMAP[hunt.queue[hunt.i]];return g.k+' means: '+g.plain}
+  return 'Open a lesson card or a quiz question and ask me again. I can explain whatever is on your screen.'}
+function whyMatters(){var c=ctxCard();if(c&&c.tip)return c.tip;return 'Every part of a big project can fail or slip. A Risk Lead asks: what could go wrong here, and who owns the fix? Knowing the parts helps you ask better questions.'}
+function imStuck(){if(view==='session'&&sess&&sess.cur&&sess.phase==='choose'&&sess.kind!=='final')return 'No problem. Here is a hint: '+hintFor(sess.cur.q);if(view==='lesson')return 'Take it one card at a time. Tap Next when ready. Ask me to explain this card simply, and I will.';if(view==='learn')return 'Tap the big Continue button. It always shows your next step. I will guide you from there.';return 'Tap the Learn tab, then Continue. Ask me about any word and I will explain it.'}
+function respond(q){var raw=q.trim();if(!raw)return;var l=raw.toLowerCase();chat.log.push({who:'you',t:raw});owlAct('think');
+  var best=null,bs=0;
+  GL.forEach(function(g){var k=g.k.toLowerCase(),i=l.indexOf(k);if(i>=0){var b=l.charAt(i-1),a=l.charAt(i+k.length);if((!b||/[^a-z0-9]/.test(b))&&(!a||/[^a-z0-9]/.test(a))){var sc=k.length+6;if(sc>bs){bs=sc;best={g:g}}}}var f=g.full.toLowerCase();if(f.length>4&&l.indexOf(f)>=0){var s2=f.length+3;if(s2>bs){bs=s2;best={g:g}}}});
+  var fq=null,fs=0;QA.forEach(function(e){var s=0;e.k.forEach(function(w){if(l.indexOf(w)>=0)s+=w.length>3?3:2});if(s>fs){fs=s;fq=e}});
+  if(best&&bs>=fs){var g=best.g,m=TAUGHT[g.k]&&MODS[TAUGHT[g.k]];owlSay(g.k+(g.full!==g.k?' ('+g.full+')':'')+': '+g.plain+(g.warn?' Careful: '+g.warn:'')+(m?' Taught in: '+m.title+'.':''))}
+  else if(fq&&fs>=3){var a=fq.a;if(a==='__joke__')a=pickNR('joke',D.jokes);else if(a==='__tip__')a=pickNR('tip',D.tips);else if(a==='__quiz__'){a=unlockedQs().length?'Okay. Starting a quick quiz.':'Finish a lesson first, then I can quiz you.';if(unlockedQs().length){owlSay(a);renderChat();setTimeout(function(){startSession('smart')},500);return}}owlSay(a)}
+  else owlSay('I am not sure about that one. Try asking about a term, like "what is SCADA?", or tap a button below.');
+  renderChat()}
+function renderChat(){var c=$('#chat');if(!chat.open){c.hidden=true;return}c.hidden=false;
+  var h='<h3 style="margin-top:0">Ask Owlchi</h3><div class="log" id="clog" aria-live="polite">'+chat.log.map(function(m){return '<div class="msg '+m.who+'">'+esc(m.t)+(m.btn?'<br><button class="btn" data-act="'+m.btn.act+'">'+esc(m.btn.label)+'</button>':'')+'</div>'}).join('')+'</div>'
+  +'<div class="chips"><button data-act="cq" data-q="next">What do I do next?</button><button data-act="cq" data-q="stuck">I am stuck</button><button data-act="cq" data-q="simple">Explain this simply</button><button data-act="cq" data-q="why">Why does this matter?</button><button data-act="cq" data-q="quiz">Quiz me</button><button data-act="cq" data-q="joke">Joke</button></div>'
+  +'<div class="askrow"><input id="chatq" type="text" placeholder="Ask about any term, like: what is a BESS?" aria-label="Ask Owlchi"><button class="btn" data-act="send">Ask</button></div><button class="btn alt" data-act="chat">Close</button>';
+  c.innerHTML=h;var lg=$('#clog');if(lg)lg.scrollTop=lg.scrollHeight}
+function chip(q){var l;chat.log.push({who:'you',t:{next:'What do I do next?',stuck:'I am stuck',simple:'Explain this simply',why:'Why does this matter?',quiz:'Quiz me',joke:'Tell me a joke'}[q]});owlAct('think');
+  if(q==='next'){var ns=nextStep();owlSay(ns?'Your next step: '+stepText(ns):'You have finished the core path. Try the optional topics, or practice.',ns?{act:'go',label:'Take me there'}:null)}
+  else if(q==='stuck')owlSay(imStuck());else if(q==='simple')owlSay(explainSimply());else if(q==='why')owlSay(whyMatters());
+  else if(q==='joke')owlSay(pickNR('joke',D.jokes));
+  else if(q==='quiz'){if(unlockedQs().length){owlSay('Okay. Starting a quick quiz.');renderChat();setTimeout(function(){startSession('smart')},500);return}owlSay('Finish a lesson first, then I can quiz you.')}
+  renderChat()}
+
+/* ---------- idle nudges ---------- */
+['pointerdown','keydown','touchstart'].forEach(function(e){document.addEventListener(e,function(){lastAct=Date.now();nudged=false;if(sleeping){sleeping=false;owlAct('wave')}},{passive:true})});
+setInterval(function(){if(nudged||!S.set.owl)return;if(['lesson','session','hunt','match'].indexOf(view)<0)return;if(Date.now()-lastAct>40000){nudged=true;var old=react;react=pickNR('nudge',D.nudge);renderBubble();owlAct('wave');setTimeout(function(){react=old===react?'':old;renderBubble()},14000)}},5000);
+
+/* ---------- helpers for views ---------- */
+function blocks(n,total){var s='<div class="blocks" aria-hidden="true">';for(var i=0;i<total;i++)s+='<i'+(i<n?' class="on"':'')+'></i>';return s+'</div>'}
+function pill(s){return '<span class="pill '+s+'">'+({know:'KNOW',review:'REVIEW',revisit:'REVISIT','new':'NEW'}[s])+'</span>'}
+function unlockedQs(){return QS.filter(function(q){return S.done[q.m]})}
+function nav(){var cur=function(v){return view===v||(v==='learn'&&(view==='lesson'||view==='cert'))||(v==='practice'&&view==='session')||(v==='terms'&&(view==='hunt'||view==='match'))};
+  $('#nav').innerHTML=[['learn','Learn'],['practice','Practice'],['terms','Terms'],['cheat','Cheat sheet'],['progress','Progress']].map(function(v){return '<button data-act="nav" data-v="'+v[0]+'"'+(cur(v[0])?' aria-current="page"':'')+'>'+v[1]+'</button>'}).join('');
+  $('#stage').style.display=S.set.owl?'flex':'none';document.documentElement.style.setProperty('--size',[1,1.15,1.3][S.set.size]||1);document.body.classList.toggle('still',!S.set.motion)}
+
+/* ---------- views ---------- */
+function howCard(){return '<details class="card" id="how"'+(S.introHide?'':' open')+'><summary><b>How this works</b>&nbsp;(tap to open or close)</summary>'
+  +'<p>1. Tap <b>Continue</b>. It always shows your next step.</p><p>2. Each topic: a short <b>lesson</b>, a few <b>key terms</b>, then a <b>quiz</b>.</p><p>3. Your <b>points</b> show at the top. Reading earns a little. Answering earns more.</p><p>4. Your owl helper explains anything. Tap <b>Ask Owlchi</b>.</p>'
+  +'<table><tr><td>Read a lesson card</td><td>+2</td></tr><tr><td>Flip a key term</td><td>+4 or +1</td></tr><tr><td>Finish a lesson</td><td>+20</td></tr><tr><td>Right answer</td><td>+10 (hint +7, retry +5)</td></tr><tr><td>Finish a quiz</td><td>+10, perfect +15 more</td></tr><tr><td>Match a pair</td><td>+3</td></tr><tr><td>Master a term</td><td>+5</td></tr><tr><td>Pass the Final Check</td><td>+50</td></tr></table></details>'}
+function modCard(m,n){var ms=mastery(m.id),ld=S.done[m.id],qd=S.qdone[m.id],opt=m.kind==='explore';
+  return '<div class="card mod"><h2>'+(n?n+'. ':'')+esc(m.title)+'</h2><div><span class="tag">'+(opt?'Optional':'Core')+'</span><span class="tag">Points here: '+(S.mp[m.id]||0)+'</span></div><div class="mute">'+esc(m.blurb)+'</div>'
+  +'<div class="small mute">Lesson: '+(ld?'done':'not started')+' | Quiz: '+(qd?'done':ld?'ready':'locked until lesson is done')+' | Mastered '+ms.know+' of '+ms.total+' questions</div>'
+  +'<div class="bar" role="img" aria-label="Mastered '+ms.pct+' percent"><span style="width:'+ms.pct+'%"></span></div>'
+  +'<div><button class="btn" data-act="lesson" data-m="'+m.id+'">'+(ld?'Review lesson':'Start lesson')+'</button><button class="btn alt" data-act="practice" data-m="'+m.id+'">'+(ld?'Quiz':'Quiz (lesson first)')+'</button></div></div>'}
+function vLearn(){var h=scene()+howCard(),ns=nextStep();
+  h+='<div class="card" style="border-color:var(--accent)"><h2>'+(ns?'Your next step':'Core path complete')+'</h2><p>'+(ns?esc(stepText(ns)):'You finished every step. Practice to keep it fresh, explore optional topics, or print your certificate.')+'</p>'+(ns?'<button class="btn" data-act="go">Continue</button>':'<button class="btn" data-act="nav" data-v="practice">Practice</button>')+'</div>';
+  h+='<h2 class="sec">Core path</h2>';CORE.forEach(function(m,i){h+=modCard(m,i+1)});
+  var fin=S.final;h+='<div class="card"><h2>Final Check</h2><p class="mute">20 mixed questions from the core topics. No hints. 80% to pass. Best so far: '+(fin.best||0)+'%. '+(fin.passed?'Passed.':'')+'</p>'+(coreDone()?'<button class="btn" data-act="final">'+(fin.passed?'Retake':'Start')+' Final Check</button>':'<p class="small mute">Unlocks when all core lessons are done ('+CORE.filter(function(m){return S.done[m.id]}).length+' of '+CORE.length+').</p>')+'</div>';
+  h+='<div class="card"><h2>Certificate</h2>'+(coreDone()&&fin.passed?'<p>Ready. Type your name and print or save it.</p><button class="btn" data-act="cert">Open certificate</button>':'<p class="mute">Finish all core lessons and pass the Final Check to unlock it.</p>')+'</div>';
+  h+='<h2 class="sec">Explore more (optional)</h2><p class="mute small">New material. Not required for the certificate.</p>';EXPL.forEach(function(m){h+=modCard(m,null)});return h}
+function vLesson(){var m=MODS[les.m],cards=COURSE.lessons[les.m]||[],h=scene();
+  if(les.phase==='cards'){var c=cards[les.i];
+    h+='<div class="card"><div class="small mute">'+esc(m.title)+' | card '+(les.i+1)+' of '+cards.length+'</div>'+blocks(les.i+1,cards.length)+'<span class="tag '+(c.tag==='v'?'v':'')+'">'+(c.tag==='v'?'Checked 2026-10-04':'General knowledge: confirm before quoting')+'</span><h2>'+esc(c.t)+'</h2>';
+    if(c.chain)h+='<ol class="chain">'+c.chain.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ol>';
+    (c.b||[]).forEach(function(l){h+='<p>'+esc(l)+'</p>'});
+    if(c.warn)h+='<div class="warn"><b>Two meanings.</b> '+esc(c.warn)+'</div>';if(c.tip)h+='<div class="tip">'+esc(c.tip)+'</div>';
+    h+='<div>'+(les.i>0?'<button class="btn alt" data-act="lback">Back</button>':'')+(les.i<cards.length-1?'<button class="btn" data-act="lnext">Next</button>':'<button class="btn" data-act="lterms">'+(termKeys(les.m).length?'Next: key terms':'Finish lesson')+'</button>')+'</div></div>'}
+  else if(les.phase==='terms'){var ks=termKeys(les.m),k=ks[les.ti],g=GMAP[k];
+    h+='<div class="card flash"><div class="small mute">Key term '+(les.ti+1)+' of '+ks.length+'</div>'+blocks(les.ti+1,ks.length)+'<div class="big">'+esc(g.k)+'</div>';
+    if(!les.flip)h+='<p class="mute">What does it mean? Think, then flip.</p><button class="btn" data-act="lflip">Flip</button>';
+    else{h+='<p><b>'+esc(g.full)+'</b></p><p>'+esc(g.plain)+'</p>'+(g.warn?'<div class="warn"><b>Two meanings.</b> '+esc(g.warn)+'</div>':'')+'<button class="btn" data-act="lrate" data-ok="1">Got it</button><button class="btn alt" data-act="lrate" data-ok="0">Not yet</button><p class="small mute">Not yet is fine. It comes back in the quiz.</p>'}h+='</div>'}
+  else{h+='<div class="card"><h2>Lesson complete</h2><p>You finished "'+esc(m.title)+'". Take the quiz now while it is fresh.</p><button class="btn" data-act="practice" data-m="'+m.id+'">Take the quiz</button><button class="btn alt" data-act="nav" data-v="learn">Back to your path</button></div>'}
+  return h}
+function vPractice(){var c=counts(),un=unlockedQs().length,h=scene();
+  h+='<div class="card"><h2>Smart session</h2><p>8 questions: a mix of ideas and terms. It brings back what you missed first.</p><p>'+pill('revisit')+' '+c.revisit+' &nbsp; '+pill('review')+' '+c.review+' &nbsp; '+pill('know')+' '+c.know+' &nbsp; '+pill('new')+' '+c['new']+'</p><button class="btn" data-act="practice" data-m="smart">Start smart session</button></div>';
+  h+='<div class="card"><h2>Final Check</h2>'+(coreDone()?'<button class="btn" data-act="final">Start Final Check</button>':'<p class="mute small">Unlocks when all core lessons are done.</p>')+'</div>';
+  h+='<div class="card"><h2>Pick a topic</h2><p class="mute small">Learn a topic, or quiz yourself on it. Quizzes unlock after that topic\'s lesson. Optional topics are extra, new material.</p>';
+  COURSE.modules.forEach(function(m){h+='<div class="term"><b>'+esc(m.title)+'</b> <span class="tag">'+(m.kind==='explore'?'Optional':'Core')+'</span><br><button class="btn alt" data-act="lesson" data-m="'+m.id+'">'+(S.done[m.id]?'Review lesson':'Learn')+'</button><button class="btn" data-act="practice" data-m="'+m.id+'">'+(S.done[m.id]?'Practice':'Practice (lesson first)')+'</button></div>'});
+  return h+'</div>'}
+function vSession(){var h=scene();
+  if(sess.gate)return h+'<div class="card"><h2>Lesson first</h2><p>'+(sess.mod==='smart'||sess.mod==='final'?'Finish at least one lesson so the questions only cover what you have learned.':'This topic\'s lesson is not done yet. Quiz questions only cover what a lesson has taught. It takes about five minutes.')+'</p>'+(sess.mod==='smart'||sess.mod==='final'?'<button class="btn" data-act="go">Continue</button>':'<button class="btn" data-act="lesson" data-m="'+sess.mod+'">Start the lesson</button><button class="btn alt" data-act="forceq" data-m="'+sess.mod+'">Quiz anyway</button>')+'</div>';
+  if(sess.empty)return h+'<div class="card"><h2>No questions here yet</h2><button class="btn" data-act="nav" data-v="practice">Back</button></div>';
+  if(sess.phase==='done'){var pct=Math.round(100*sess.right/Math.max(1,sess.right+sess.wrong)),lines=sess.missed.filter(function(v,i,a){return a.indexOf(v)===i}).map(function(id){var q=QMAP[id];return '<div class="term"><b>'+esc(q.q)+'</b><br>Answer: '+esc(sess.answers[id])+'</div>'}).join('');
+    if(sess.kind==='final'){var weak={},wk=[];sess.missed.forEach(function(id){var m=QMAP[id].m;weak[m]=(weak[m]||0)+1});Object.keys(weak).sort(function(a,b){return weak[b]-weak[a]}).slice(0,3).forEach(function(m){wk.push(MODS[m].title)});
+      return h+'<div class="card"><h2>Final Check: '+sess.score+'%</h2><p>'+(sess.score>=80?'You passed. Your certificate is unlocked.':'Not yet. You need 80%. Review the topics below and try again.')+'</p>'+(wk.length?'<p><b>Review:</b> '+esc(wk.join('; '))+'</p>':'')+(lines?'<h3>Missed</h3>'+lines:'')+(sess.score>=80?'<button class="btn" data-act="cert">Open certificate</button>':'<button class="btn" data-act="final">Try again</button>')+'<button class="btn alt" data-act="nav" data-v="learn">Back</button></div>'}
+    return h+'<div class="card"><h2>Session done</h2><p>'+sess.right+' right, '+sess.wrong+' missed ('+pct+'%). +'+(S.xp-sess.startXP)+' points.</p>'+(lines?'<h3>Look at these again</h3>'+lines:'<p>Nothing missed.</p>')+'<button class="btn" data-act="practice" data-m="'+sess.mod+'">Another session</button><button class="btn alt" data-act="go">What is next?</button><button class="btn alt" data-act="nav" data-v="progress">See progress</button></div>'}
+  var c=sess.cur,q=c.q,n=sess.i+1,tot=sess.queue.length;
+  h+='<div class="card"><div class="small mute">'+(sess.kind==='final'?'Final Check | ':'')+'Question '+n+' of '+tot+'</div>'+blocks(n,tot)+'<div class="qtext">'+esc(q.q)+'</div>';
+  h+=c.opts.map(function(o,i){var cls='choice',mk='';if(sess.phase==='fb'){if(o===c.correct){cls+=' right';mk='<span class="mk">&#10003; Correct answer</span>'}else if(o===c.picked){cls+=' wrong';mk='<span class="mk">&#10007; Your pick</span>'}}return '<button class="'+cls+'" data-act="choose" data-i="'+i+'"'+(sess.phase==='fb'?' disabled':'')+'><span class="n">'+(i+1)+'</span><span>'+esc(o)+mk+'</span></button>'}).join('');
+  if(sess.phase==='choose'&&sess.kind!=='final'){h+=c.hint?'<div class="tip"><b>Hint.</b> '+esc(hintFor(q))+'<br><span class="small">A right answer is now worth +7.</span></div>':'<button class="btn alt" data-act="hint">Hint (answer worth +7)</button>'}
+  if(sess.phase==='fb'){var ok=c.picked===c.correct;h+='<div class="fb" aria-live="polite"><p><b>'+(ok?'Right.':'Not this time.')+'</b> '+(sess.kind==='final'?'':pill(status(q.id)))+'</p><p>'+esc(q.why||'')+'</p><button class="btn" data-act="next">'+(sess.i>=sess.queue.length-1?'Finish':'Next')+'</button></div>'}
+  return h+'</div>'}
+function wpool(m){return GL.filter(function(g){return m==='all'||g.m===m})}
+function rank(){var k=GL.filter(function(g){return tstatus(g.k)==='know'}).length;return k>=60?'Term Master':k>=35?'Term Ranger':k>=15?'Term Scout':'Term Sprout'}
+function vTerms(){var h=scene(),col=GL.filter(function(g){return tstatus(g.k)!=='new'}).length,kn=GL.filter(function(g){return tstatus(g.k)==='know'}).length;
+  h+='<div class="card"><h2>Your term collection</h2><p>'+rank()+' | collected '+col+' of '+GL.length+' | mastered '+kn+'</p><div class="tiles" aria-hidden="true">'+GL.map(function(g){return '<i class="'+tstatus(g.k)+'">'+esc(g.k)+'</i>'}).join('')+'</div><p class="small mute">Green = mastered. Orange = learning. Red = needs work. Grey = not seen yet.</p></div>';
+  h+='<div class="card"><h2>Play with terms</h2><label for="wtopic" class="small mute">Topic</label><select id="wtopic"><option value="all">All terms</option>'+COURSE.modules.map(function(m){return '<option value="'+m.id+'"'+(wmod===m.id?' selected':'')+'>'+esc(m.title)+'</option>'}).join('')+'</select><button class="btn" data-act="hunt">Flip cards</button><button class="btn alt" data-act="match">Match game</button><p class="small mute">Terms are also taught at the end of every lesson and mixed into quizzes.</p></div>';
+  h+='<div class="card"><h2>Browse all terms</h2><label for="wq" class="small mute">Search</label><input id="wq" type="search" value="'+esc(wq)+'" placeholder="Type a term or part of it"><div class="chips" role="group" aria-label="Filter">'+[['all','All'],['top','Top terms'],['two','Two meanings']].map(function(f){return '<button data-act="wf" data-f="'+f[0]+'" aria-pressed="'+(wfilter===f[0])+'">'+f[1]+'</button>'}).join('')+'</div><div id="wlist">'+wlist(wfiltered())+'</div></div>';
+  return h}
+function wfiltered(){return GL.filter(function(g){if(wfilter==='top'&&!g.top)return false;if(wfilter==='two'&&!g.two)return false;if(wq&&(g.k+' '+g.full+' '+g.plain).toLowerCase().indexOf(wq)<0)return false;return true}).sort(function(a,b){return a.k.localeCompare(b.k)})}
+function wlist(list){if(!list.length)return '<p class="mute">Nothing matches.</p>';return list.map(function(g){return '<div class="term"><b>'+esc(g.k)+'</b>'+(g.full&&g.full!==g.k?' <span class="mute">= '+esc(g.full)+'</span>':'')+'<br>'+esc(g.plain)+(g.warn?'<div class="warn small"><b>Two meanings.</b> '+esc(g.warn)+'</div>':'')+'</div>'}).join('')}
+function vHunt(){var h=scene();if(hunt.done)return h+'<div class="card"><h2>Flip cards done</h2><p>'+hunt.knew+' of '+hunt.queue.length+' you knew. +'+(S.xp-hunt.startXP)+' points.</p><button class="btn" data-act="hunt">Another round</button><button class="btn alt" data-act="nav" data-v="terms">Back to Terms</button></div>';
+  var k=hunt.queue[hunt.i],g=GMAP[k];h+='<div class="card flash"><div class="small mute">Term '+(hunt.i+1)+' of '+hunt.queue.length+'</div>'+blocks(hunt.i+1,hunt.queue.length)+'<div class="big">'+esc(g.k)+'</div>';
+  if(!hunt.flip)h+='<p class="mute">What does it mean? Think, then flip.</p><button class="btn" data-act="hflip">Flip</button>';
+  else h+='<p><b>'+esc(g.full)+'</b></p><p>'+esc(g.plain)+'</p>'+(g.warn?'<div class="warn"><b>Two meanings.</b> '+esc(g.warn)+'</div>':'')+'<button class="btn" data-act="hrate" data-ok="1">Got it</button><button class="btn alt" data-act="hrate" data-ok="0">Not yet</button>';
+  return h+'</div>'}
+function vMatch(){var h=scene();if(match.done)return h+'<div class="card"><h2>Match done</h2><p>+'+(S.xp-match.startXP)+' points.</p><button class="btn" data-act="match">Play again</button><button class="btn alt" data-act="nav" data-v="terms">Back to Terms</button></div>';
+  var r=match.rounds[match.r];h+='<div class="card"><div class="small mute">Round '+(match.r+1)+' of '+match.rounds.length+'</div>'+blocks(match.r+1,match.rounds.length)+'<div class="mgrid"><div>'+r.map(function(k){var c=match.solved[k]?' ok':match.selK===k?' sel':'';return '<button class="'+c.trim()+'" data-act="mk" data-k="'+esc(k)+'"'+(match.solved[k]?' disabled':'')+'>'+esc(k)+'</button>'}).join('<div style="height:10px"></div>')+'</div><div>'+match.order.map(function(k){return '<button class="'+(match.solved[k]?'ok':'')+'" data-act="mp" data-k="'+esc(k)+'"'+(match.solved[k]?' disabled':'')+'>'+esc(GMAP[k].plain)+'</button>'}).join('<div style="height:10px"></div>')+'</div></div>';
+  if(r.every(function(k){return match.solved[k]}))h+='<button class="btn" data-act="mnext">'+(match.r>=match.rounds.length-1?'Finish':'Next round')+'</button>';return h+'</div>'}
+function vCheat(){var h=scene()+'<div class="card printable"><h2>Cheat sheet</h2><p class="mute small">Print this page or keep it open.</p><button class="btn noprint" data-act="print">Print</button></div>';
+  h+='<div class="card printable"><h3>Say it simply</h3>'+CHEAT.oneliners.map(function(o){return '<p><b>'+esc(o[0])+'</b> '+esc(o[1])+'</p>'}).join('')+'</div>';
+  h+='<div class="card printable"><h3>The chains</h3><div class="cols">'+CHEAT.chains.map(function(c){return '<div><b>'+esc(c.t)+'</b><br>'+c.s.map(esc).join(' &rarr; ')+'</div>'}).join('')+'</div></div>';
+  h+='<div class="card printable"><h3>Top terms</h3><div class="cols">'+GL.filter(function(g){return g.top}).map(function(g){return '<div><b>'+esc(g.k)+'</b> '+esc(g.full)+'. '+esc(g.plain)+'</div>'}).join('')+'</div></div>';
+  h+='<div class="card printable"><h3>Terms with two meanings</h3>'+GL.filter(function(g){return g.warn}).map(function(g){return '<p><b>'+esc(g.k)+'</b>: '+esc(g.full)+'. '+esc(g.warn)+'</p>'}).join('')+'</div>';
+  if(CHEAT.facts.length)h+='<div class="card printable"><h3>Facts and sources</h3><table>'+CHEAT.facts.map(function(f){return '<tr><td>'+esc(f[0])+'</td><td class="mute">'+esc(f[1])+'</td></tr>'}).join('')+'</table></div>';
+  h+='<div class="card printable"><h3>Risk in one line</h3><p>Risk, trigger, impact, likelihood, owner, mitigation, evidence, status. Score = likelihood x impact. Avoid, reduce, transfer, or accept. Ask: is the fix working, or just reported?</p></div>';
+  if(CHEAT.ask.length)h+='<div class="card printable"><h3>Questions to ask</h3><ul>'+CHEAT.ask.map(function(a){return '<li>'+esc(a)+'</li>'}).join('')+'</ul></div>';
+  if(CHEAT.dontknow.length)h+='<div class="card printable"><h3>If you do not know a term</h3><ul>'+CHEAT.dontknow.map(function(a){return '<li>'+esc(a)+'</li>'}).join('')+'</ul></div>';
+  h+='<div class="card printable"><h3>Tell me about yourself</h3><p class="small mute">Three parts: where you are now, how you got here, why this role. 60 to 90 seconds. Saved on this device only.</p><textarea id="n-about" data-note="about" placeholder="Now: ...&#10;Before: ...&#10;Why this role: ..." aria-label="About me"></textarea></div>';
+  h+='<div class="card printable"><h3>My three stories</h3><p class="small mute">Situation, Task, Action, Result. Use your own real examples.</p><label class="small" for="n-s1">A time I challenged an assumption</label><textarea id="n-s1" data-note="s1"></textarea><label class="small" for="n-s2">A time a team disagreed with me</label><textarea id="n-s2" data-note="s2"></textarea><label class="small" for="n-s3">A time I prevented a failure</label><textarea id="n-s3" data-note="s3"></textarea></div>';
+  return h}
+function hashCode(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(16).toUpperCase().padStart(8,'0')}
+function vCert(){var h=scene();
+  if(!(coreDone()&&S.final.passed)){var n=CORE.filter(function(m){return S.done[m.id]}).length;return h+'<div class="card"><h2>Certificate locked</h2><p>To unlock it:</p><p>'+(coreDone()?'&#10003;':'&#9633;')+' Finish all core lessons ('+n+' of '+CORE.length+')</p><p>'+(S.final.passed?'&#10003;':'&#9633;')+' Pass the Final Check (80% or higher)</p><button class="btn" data-act="go">Continue</button></div>'}
+  S.certSeen=true;save();var nm=S.name||'',d=S.final.date||today(),code=hashCode((nm||'x')+d+COURSE.id+S.final.best);
+  h+='<div class="card noprint"><h2>Your certificate</h2><label class="small mute" for="certname">Type your name as it should appear</label><input id="certname" type="text" value="'+esc(nm)+'" maxlength="60" placeholder="Your name"><button class="btn" data-act="print">Print or save as PDF</button></div>';
+  h+='<div class="card printable cert"><div>'+owlSVG('happy')+'</div><p class="mute">Certificate of Completion</p><p>This certifies that</p><div class="name" id="certdisp">'+esc(nm||'Your name')+'</div><p>has completed</p><h2>'+esc(CERT_TITLE)+'</h2><p>Final Check score: '+S.final.best+'% | Date: '+esc(d)+'</p><p class="small mute">Completion code: '+code+'</p><p class="small mute">Issued by the Owlchi self-study game. This is not an accredited credential and is not endorsed by any company named in the course.</p></div>';
+  return h}
+function vProgress(){var c=counts(),tot=QS.length,h=scene();
+  h+='<div class="card"><h2>Progress</h2><p>Level '+level()+' '+esc(ltitle())+'. '+S.xp+' points. '+S.days.length+' days practiced.</p><p>'+pill('know')+' '+c.know+' &nbsp; '+pill('review')+' '+c.review+' &nbsp; '+pill('revisit')+' '+c.revisit+' &nbsp; '+pill('new')+' '+c['new']+' of '+tot+'</p><p class="small mute">KNOW = 3 right in a row. REVIEW = learning. REVISIT = missed twice and not recovered yet. NEW = not asked yet.</p></div>';
+  h+='<div class="card"><h3>Points by section</h3><table><tr><td>Lessons</td><td>'+(S.pts.lesson||0)+'</td></tr><tr><td>Quizzes</td><td>'+(S.pts.quiz||0)+'</td></tr><tr><td>Terms</td><td>'+(S.pts.terms||0)+'</td></tr><tr><td>Bonuses</td><td>'+(S.pts.bonus||0)+'</td></tr><tr><td><b>Total</b></td><td><b>'+S.xp+'</b></td></tr></table>'+(S.log.length?'<h3>Recent points</h3>'+S.log.slice(0,6).map(function(l){return '<div class="small">+'+l[1]+' '+esc(l[0])+'</div>'}).join(''):'')+'</div>';
+  h+='<div class="card"><h3>Topic mastery</h3><p class="small mute">How many of a topic\'s quiz questions you have mastered (3 right in a row). Tap Practice to raise a bar.</p>';
+  COURSE.modules.forEach(function(m){var ms=mastery(m.id);h+='<p><b>'+esc(m.title)+'</b><br><span class="small mute">Mastered '+ms.know+' of '+ms.total+'</span></p><div class="bar"><span style="width:'+ms.pct+'%"></span></div>'+(S.done[m.id]?'<button class="btn alt" data-act="practice" data-m="'+m.id+'">Practice</button>':'<span class="small mute">Do the lesson first</span>')});
+  h+='</div><div class="card"><h3>Settings</h3><label class="row"><input type="checkbox" data-set="music"'+(S.set.music?' checked':'')+'> Background music</label><label class="row"><input type="checkbox" data-set="sfx"'+(S.set.sfx?' checked':'')+'> Sound effects</label><label for="vol" class="small mute">Volume</label><input id="vol" type="range" min="0" max="1" step="0.05" value="'+S.set.vol+'"><label class="row"><input type="checkbox" data-set="owl"'+(S.set.owl?' checked':'')+'> Show the owl helper</label><label class="row"><input type="checkbox" data-set="motion"'+(S.set.motion?' checked':'')+'> Owl animation</label><label for="sz" class="small mute">Text size</label><select id="sz"><option value="0"'+(S.set.size==0?' selected':'')+'>Normal</option><option value="1"'+(S.set.size==1?' selected':'')+'>Large</option><option value="2"'+(S.set.size==2?' selected':'')+'>Larger</option></select></div>';
+  h+='<div class="card"><h3>Your data</h3><p class="small mute">Stays on this device. Export a copy to keep it safe or move it.</p><button class="btn alt" data-act="export">Export progress</button><button class="btn alt" data-act="import">Import progress</button><button class="btn alt" data-act="reset">Reset everything</button><input type="file" id="imp" accept="application/json" hidden></div>';
+  h+='<div class="card"><h3>About and your own course</h3><p class="small">Owlchi is open source under the MIT License. Not affiliated with or endorsed by any company named in a course.</p><p class="small">Make a course for any role or topic: copy the prompt, give it to an AI assistant with your document or image, check its sources, then load the file it makes.</p><button class="btn alt" data-act="copyprompt">Copy the course-building prompt</button><label class="small mute" for="cfile">Load a course file (.json)</label><input type="file" id="cfile" accept="application/json">'+(custom?'<p><a class="btn alt" href="'+location.pathname+'">Back to the built-in course</a></p>':'')+'</div>';
+  return h}
+var PROMPT="I will upload a document or image (a job posting, manual, or syllabus). Please:\n1) Extract the topics.\n2) Research and fact-check every claim with sources. Mark anything you cannot verify as general knowledge.\n3) Build a beginner-friendly course as ONE JSON file with this shape:\n{\"id\":\"short-id\",\"title\":\"...\",\"certTitle\":\"...\",\n\"modules\":[{\"id\":\"m0\",\"kind\":\"core\" or \"explore\",\"title\":\"...\",\"blurb\":\"...\",\"terms\":[\"Term A\",\"Term B\"]}],\n\"lessons\":{\"m0\":[{\"t\":\"Card title\",\"tag\":\"v\" (checked) or \"g\" (general),\"b\":[\"short line\"],\"chain\":[\"step\"],\"tip\":\"...\",\"warn\":\"...\"}]},\n\"questions\":[{\"id\":\"q1\",\"m\":\"m0\",\"q\":\"...\",\"a\":[\"correct answer first\",\"wrong\",\"wrong\",\"wrong\"],\"why\":\"...\",\"l\":0 (lesson card index)}],\n\"glossary\":[{\"k\":\"Term\",\"full\":\"Full name\",\"plain\":\"one plain sentence\",\"m\":\"m0\",\"q\":1 (only for acronyms),\"warn\":\"if it has two meanings\"}],\n\"owl\":{\"qa\":[{\"k\":[\"keyword\"],\"a\":\"answer\"}]},\n\"cheat\":{\"oneliners\":[[\"Question\",\"Answer\"]],\"chains\":[{\"t\":\"Name\",\"s\":[\"step\"]}],\"facts\":[[\"fact\",\"source and date\"]],\"ask\":[],\"dontknow\":[]}}\nRules: plain words, 5 lines or fewer per lesson card, 5 to 6 key terms per module (each must exist in the glossary), only quiz what the lessons teach, include one 'big picture' starter module, no personal data, cite sources, never invent facts.";
+function render(){nav();var h='';
+  if(view==='learn')h=vLearn();else if(view==='lesson')h=vLesson();else if(view==='practice')h=vPractice();else if(view==='session')h=vSession();else if(view==='terms')h=vTerms();else if(view==='hunt')h=vHunt();else if(view==='match')h=vMatch();else if(view==='cheat')h=vCheat();else if(view==='cert')h=vCert();else h=vProgress();
+  $('#app').innerHTML=h;
+  if(view==='cheat'){['about','s1','s2','s3'].forEach(function(k){var el=document.querySelector('[data-note="'+k+'"]');if(el)el.value=S.notes[k]||''})}
+  renderBubble();hud();window.scrollTo(0,0)}
+
+/* ---------- lessons ---------- */
+function markRead(){var key=les.m+':'+les.i;if(!S.read[key]){S.read[key]=1;award(2,'Read a card','lesson',les.m)}}
+function openLesson(m){les={m:m,i:0,phase:'cards',ti:0,flip:false};view='lesson';react=pickNR('lesson',D.lesson);owlAct('idle');markRead();render()}
+function finishLesson(){if(!S.done[les.m]){S.done[les.m]=true;award(20,'Lesson complete','lesson',les.m);if(CORE.every(function(m){return S.done[m.id]}))react='Core path complete. Time for the Final Check.'}les.phase='done';save();owlAct('cheer')}
+function rateTerm(k,ok,mod,cat){var w=S.terms[k]||(S.terms[k]={box:0,miss:0,seen:0,day:'',bonus:0}),first=w.day!==today();w.seen++;if(ok){w.box=Math.min(4,w.box+1);if(w.box>=3)w.miss=0}else{w.box=0;w.miss++}w.day=today();save();dailyBonus();if(first)award(ok?4:1,ok?'Term: got it':'Term: practiced','terms',mod);if(w.box>=3&&!w.bonus){w.bonus=1;award(5,'Term mastered','terms',mod)}}
+
+/* ---------- sessions ---------- */
+function pickFrom(list,n){var g={revisit:[],review:[],'new':[],know:[]};list.forEach(function(q){g[status(q.id)].push(q.id)});return shuffle(g.revisit).concat(shuffle(g.review),shuffle(g['new']),shuffle(g.know)).slice(0,n)}
+function startSession(mod,force){
+  if(mod==='smart'||mod==='final'){if(!unlockedQs().length){sess={gate:true,mod:mod};view='session';render();return}}
+  else if(!S.done[mod]&&!force){sess={gate:true,mod:mod};view='session';render();return}
+  var pool=mod==='smart'?unlockedQs():QS.filter(function(q){return q.m===mod}),con=pool.filter(function(q){return !q.gen}),trm=pool.filter(function(q){return q.gen});
+  var ids=pickFrom(con,5);ids=ids.concat(pickFrom(trm,8-ids.length));if(ids.length<8)ids=ids.concat(pickFrom(pool.filter(function(q){return ids.indexOf(q.id)<0}),8-ids.length));
+  sess={kind:'practice',mod:mod,queue:shuffle(ids),i:0,right:0,wrong:0,run:0,wrongRun:0,missed:[],tries:{},retried:{},answers:{},startXP:S.xp,empty:!ids.length};
+  view='session';react='';if(!sess.empty)loadCur();owlAct('idle');render()}
+function startFinal(){
+  if(!coreDone()){sess={gate:true,mod:'final'};view='session';render();return}
+  var ids=[],rest=[];CORE.forEach(function(m){var q=shuffle(modQs(m.id));ids=ids.concat(q.slice(0,2).map(function(x){return x.id}));rest=rest.concat(q.slice(2).map(function(x){return x.id}))});
+  ids=shuffle(ids);if(ids.length<20)ids=ids.concat(shuffle(rest).slice(0,20-ids.length));ids=ids.slice(0,20);
+  S.final.tries++;save();sess={kind:'final',mod:'final',queue:shuffle(ids),i:0,right:0,wrong:0,run:0,wrongRun:0,missed:[],tries:{},retried:{},answers:{},startXP:S.xp};
+  view='session';react='';loadCur();owlAct('idle');render()}
+function loadCur(){var q=QMAP[sess.queue[sess.i]],o=optionsFor(q);sess.cur={q:q,opts:o.opts,correct:o.correct,picked:null,hint:false};sess.phase='choose'}
+function choose(i){if(!sess||sess.phase!=='choose')return;var c=sess.cur,id=c.q.id;c.picked=c.opts[i];var ok=c.picked===c.correct;sess.answers[id]=c.correct;sess.tries[id]=(sess.tries[id]||0)+1;
+  if(sess.kind==='practice'){record(id,ok);dailyBonus()}
+  if(ok){sess.right++;sess.run++;sess.wrongRun=0;react=sess.run===3||sess.run===5?pickNR('streak',D.streak):pickNR('right',D.right);owlAct('happy');tone([[660,.09],[880,.12]]);
+    if(sess.kind==='practice')award(c.hint?7:(sess.tries[id]===1?10:5),c.hint?'Right (hint)':sess.tries[id]===1?'Right answer':'Right (retry)','quiz',sess.mod)}
+  else{sess.wrong++;sess.run=0;sess.wrongRun++;sess.missed.push(id);react=pickNR('wrong',D.wrong)+(sess.wrongRun>=2&&sess.kind==='practice'?' Two in a row. Want a hint next time? Tap Hint, or ask me.':'');owlAct('oops');tone([[220,.18]]);
+    if(sess.kind==='practice'&&!sess.retried[id]){sess.retried[id]=1;sess.queue.push(id)}}
+  sess.phase='fb';render()}
+function nextQ(){sess.i++;react='';if(sess.i>=sess.queue.length){finishSession()}else{loadCur();owlAct('idle')}render()}
+function finishSession(){sess.phase='done';
+  if(sess.kind==='final'){var tot=sess.queue.length,wrongN=new Set(sess.missed).size,score=Math.round(100*(tot-wrongN)/tot);sess.score=score;S.final.best=Math.max(S.final.best,score);S.final.date=today();var first=score>=80&&!S.final.passed;if(score>=80)S.final.passed=true;save();
+    if(first){award(50,'Passed the Final Check','bonus');react=D.milestone[3];owlAct('cheer')}else{react=score>=80?'Passed again. Nice.':'Not yet. Review and try again. You can do this.';owlAct(score>=80?'happy':'think')}}
+  else{award(10,'Quiz finished','quiz',sess.mod);if(sess.wrong===0&&sess.queue.length>=5)award(15,'Perfect quiz','quiz',sess.mod);if(sess.mod!=='smart'&&MODS[sess.mod]){S.qdone[sess.mod]=true;save()}react=pickNR('done',D.done);owlAct(sess.wrong===0?'cheer':'happy')}}
+
+/* ---------- terms games ---------- */
+function startHunt(mod){var pool=wpool(mod),g={revisit:[],review:[],'new':[],know:[]};pool.forEach(function(x){g[tstatus(x.k)].push(x.k)});var ids=shuffle(g.revisit).slice(0,3).concat(shuffle(g.review).slice(0,2),shuffle(g['new']));ids=ids.concat(shuffle(g.know)).slice(0,8);hunt={mod:mod,queue:ids,i:0,flip:false,knew:0,done:false,startXP:S.xp};if(!ids.length){view='terms';return render()}view='hunt';react='';owlAct('idle');render()}
+function startMatch(mod){var pool=wpool(mod).filter(function(x){return x.plain.length<110}),g={nw:[],kn:[]};pool.forEach(function(x){(tstatus(x.k)==='know'?g.kn:g.nw).push(x.k)});var ids=shuffle(g.nw).concat(shuffle(g.kn)).slice(0,12);if(ids.length<4){view='terms';return render()}
+  var rounds=[];for(var i=0;i+4<=ids.length;i+=4)rounds.push(ids.slice(i,i+4));match={mod:mod,rounds:rounds,r:0,solved:{},selK:null,order:shuffle(rounds[0]),done:false,startXP:S.xp};view='match';react='';owlAct('idle');render()}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!b)return;var a=b.dataset.act;
+  if(a==='nav'){view=b.dataset.v;sess=null;react=view==='learn'&&S.days.length?pickNR('greet',D.greet):'';owlAct('idle');render()}
+  else if(a==='go'){goStep(nextStep())}
+  else if(a==='lesson'){openLesson(b.dataset.m)}
+  else if(a==='lnext'){les.i++;react='';markRead();render()}
+  else if(a==='lback'){les.i--;react='';render()}
+  else if(a==='lterms'){var ks=termKeys(les.m);if(ks.length){les.phase='terms';les.ti=0;les.flip=false;react='';render()}else{finishLesson();render()}}
+  else if(a==='lflip'){les.flip=true;render()}
+  else if(a==='lrate'){var k=termKeys(les.m)[les.ti];rateTerm(k,b.dataset.ok==='1',les.m);les.ti++;les.flip=false;if(les.ti>=termKeys(les.m).length)finishLesson();render()}
+  else if(a==='practice'){startSession(b.dataset.m)}
+  else if(a==='forceq'){startSession(b.dataset.m,true)}
+  else if(a==='final'){startFinal()}
+  else if(a==='choose'){choose(+b.dataset.i)}
+  else if(a==='hint'){sess.cur.hint=true;render()}
+  else if(a==='next'){nextQ()}
+  else if(a==='cert'){view='cert';render()}
+  else if(a==='hunt'){var sel=$('#wtopic');if(sel)wmod=sel.value;startHunt(wmod)}
+  else if(a==='match'){var sel2=$('#wtopic');if(sel2)wmod=sel2.value;startMatch(wmod)}
+  else if(a==='hflip'){hunt.flip=true;render()}
+  else if(a==='hrate'){var hk=hunt.queue[hunt.i],ok=b.dataset.ok==='1';rateTerm(hk,ok,GMAP[hk].m);if(ok)hunt.knew++;hunt.i++;hunt.flip=false;if(hunt.i>=hunt.queue.length){hunt.done=true;award(10,'Flip cards finished','terms');owlAct('happy')}render()}
+  else if(a==='mk'){match.selK=b.dataset.k;render()}
+  else if(a==='mp'){if(!match.selK)return;if(match.selK===b.dataset.k){match.solved[match.selK]=true;award(3,'Matched a pair','terms',GMAP[match.selK].m);react='Yes. That pair is correct.';owlAct('happy');tone([[660,.09],[880,.12]])}else{react='Not that pair. Try another.';owlAct('oops');tone([[220,.18]])}match.selK=null;render()}
+  else if(a==='mnext'){match.r++;if(match.r>=match.rounds.length){match.done=true;award(10,'Match finished','terms');owlAct('cheer')}else{match.order=shuffle(match.rounds[match.r]);match.solved={};match.selK=null}react='';render()}
+  else if(a==='wf'){wfilter=b.dataset.f;render()}
+  else if(a==='print'){window.print()}
+  else if(a==='sound'){var on=S.set.music||S.set.sfx;S.set.music=!on;S.set.sfx=!on;save();applyAudio();hud();if(!on)tone([[660,.08],[880,.1]])}
+  else if(a==='chat'){chat.open=!chat.open;if(chat.open&&!chat.log.length){owlSay(pickNR('greet',D.greet));owlSay('You can ask me about any term, or tap a button below.')}owlAct(chat.open?'wave':'idle');renderChat();var ci=$('#chatq');if(chat.open&&ci)ci.focus()}
+  else if(a==='tip'){react=pickNR('tip',D.tips);owlAct('happy');renderBubble()}
+  else if(a==='cq'){chip(b.dataset.q)}
+  else if(a==='send'){var inp=$('#chatq');if(inp){var v=inp.value;inp.value='';respond(v)}}
+  else if(a==='export'){var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download='owlchi-progress-'+today()+'.json';document.body.appendChild(l);l.click();l.remove();URL.revokeObjectURL(u)}
+  else if(a==='import'){$('#imp').click()}
+  else if(a==='reset'){if(confirm('Erase all progress and notes on this device?')){try{localStorage.removeItem(KEY)}catch(x){}S=defState();applyAudio();react='Fresh start.';render()}}
+  else if(a==='copyprompt'){var done=function(){react='Prompt copied. Paste it into an AI assistant with your document.';renderBubble();popup('Prompt copied')};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(PROMPT).then(done,function(){prompt('Copy this prompt:',PROMPT)});else prompt('Copy this prompt:',PROMPT)}
+});
+document.addEventListener('change',function(e){var t=e.target;
+  if(t.dataset&&t.dataset.set){S.set[t.dataset.set]=t.checked;save();applyAudio();nav();hud()}
+  else if(t.id==='sz'){S.set.size=+t.value;save();nav()}
+  else if(t.id==='wtopic'){wmod=t.value}
+  else if(t.id==='imp'){var f=t.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result),n=defState();for(var k in d){if(n[k]&&typeof n[k]==='object'&&!Array.isArray(n[k])&&['set','notes','pts','final'].indexOf(k)>=0){for(var j in d[k])n[k][j]=d[k][j]}else n[k]=d[k]}S=n;save();applyAudio();react='Progress imported.';render()}catch(x){alert('That file could not be read.')}};r.readAsText(f)}
+  else if(t.id==='cfile'){var cf=t.files[0];if(!cf)return;var cr=new FileReader();cr.onload=function(){try{var cc=JSON.parse(cr.result);if(!validCourse(cc))throw 0;localStorage.setItem('owlchi.custom',JSON.stringify(cc));location.href=location.pathname+'?c=custom'}catch(x){alert('That file is not a valid course. Check it against the prompt shape.')}};cr.readAsText(cf)}
+});
+document.addEventListener('input',function(e){var t=e.target;
+  if(t.id==='wq'){wq=t.value.toLowerCase().trim();$('#wlist').innerHTML=wlist(wfiltered())}
+  else if(t.id==='vol'){S.set.vol=+t.value;save();if(MU.master)MU.master.gain.value=0.5*S.set.vol}
+  else if(t.id==='certname'){S.name=t.value;save();var d=$('#certdisp');if(d)d.textContent=t.value||'Your name'}
+  else if(t.dataset&&t.dataset.note){S.notes[t.dataset.note]=t.value;save()}});
+document.addEventListener('keydown',function(e){var tg=e.target.tagName;
+  if(tg==='INPUT'&&e.target.id==='chatq'&&e.key==='Enter'){var v=e.target.value;e.target.value='';respond(v);return}
+  if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT')return;if(view!=='session'||!sess||sess.gate||sess.empty)return;
+  if(sess.phase==='choose'&&/^[1-4]$/.test(e.key)){var i=+e.key-1;if(sess.cur.opts[i]!==undefined)choose(i)}
+  else if(e.key==='Enter'&&tg!=='BUTTON'&&sess.phase==='fb')nextQ()});
+
+/* ---------- start ---------- */
+$('#ctitle').textContent=COURSE.title;
+react=S.days.length?pickNR('greet',D.greet):D.greet[0];
+setFrame('idle','bob');owlAct('wave');
+render();
+}
+})();
+</script>
+</body>
+</html>
